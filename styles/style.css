@@ -1,1 +1,10 @@
+.menu{
+    display: flex;
+    justify-content: flex-end;
+    position: sticky;
+}
 
+#burger-menu{
+    width: 60px;
+    height: 60px;
+}
