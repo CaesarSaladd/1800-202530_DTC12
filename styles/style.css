@@ -1,1 +1,15 @@
+.footericons {
+    display: flex;
+    flex-direction: row;
+    flex-grow: inherit;
+    justify-content: center;
+    align-items: flex-end;
+    position: fixed;
+    bottom: 0;
+    right: 50%;
+    left: 50%;
+}
 
+.ficons {
+    margin-right: 20px;
+}
