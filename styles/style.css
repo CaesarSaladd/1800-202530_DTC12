@@ -1,10 +1,10 @@
-.menu{
+.menu {
     display: flex;
     justify-content: flex-end;
     position: sticky;
 }
 
-#burger-menu{
+#burger-menu {
     width: 60px;
     height: 60px;
 }
@@ -17,10 +17,11 @@
     align-items: flex-end;
     position: fixed;
     bottom: 0;
-    right: 50%;
-    left: 50%;
+    right: 25%;
+    left: 25%;
 }
 
 .ficons {
     margin-right: 20px;
+
 }
