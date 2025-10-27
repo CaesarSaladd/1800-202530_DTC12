@@ -1,10 +1,27 @@
-.menu{
+.menu {
     display: flex;
     justify-content: flex-end;
     position: sticky;
 }
 
-#burger-menu{
+#burger-menu {
     width: 60px;
     height: 60px;
+}
+
+.footericons {
+    display: flex;
+    flex-direction: row;
+    flex-grow: inherit;
+    justify-content: center;
+    align-items: flex-end;
+    position: fixed;
+    bottom: 0;
+    right: 25%;
+    left: 25%;
+}
+
+.ficons {
+    margin-right: 20px;
+
 }
