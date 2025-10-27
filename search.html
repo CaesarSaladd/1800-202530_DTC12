@@ -14,36 +14,46 @@
     <link rel="stylesheet" href="./styles/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Orbitron:wght@400..900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
 
 </head>
 
-<body class="mx-auto max-w-screen-lg my-3">
+<body class="mx-auto max-w-screen-lg">
     <!-- Call to Action -->
 
-    <div class="menu">
-        <button id="burgericon" class=" hover:bg-gray-400 rounded-lg"><img src="burger.svg" id="burger-menu"></button>
-        <div id="filters" class="hidden flex-col space-y-2">
-            <button type="button" class="btn btn-outline-secondary btn-lg px-4"> Distance </button>
-            <button type="button" class="btn btn-outline-secondary btn-lg px-4"> Price </button>
-            <button type="button" class="btn btn-outline-secondary btn-lg px-4"> Reviews </button>
-            <button type="button" class="btn btn-outline-secondary btn-lg px-4"> Cuisine </button>
-        </div>
+    <div class="menu flex flex-row justify-between overflow-hidden">
+        <img src="./images/binge invis.png" width="100" class="object-contain pl-3">
+        <a href="#"><img src="burger.svg" id="burger-menu"></a>
     </div>
-
     <main>
-        <div class="px-4 py-5 my-5 text-center">
-            <img class="d-block mx-auto mb-4" src="./images/binge.jpg" alt="" width="400" height="240">
-            <h1 class="display-5 fw-bold text-body-emphasis binge-font">Discover New Restaurants in Downtown Vancouver!
-            </h1>
-            <div class="col-lg-6 mx-auto">
-                <p class="lead mb-4 binge-font"> Find your next craving.</p>
-                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                    <button type="button" class="btn btn-primary btn-lg px-4 gap-3 binge-font">Login</button>
-                    <button type="button" class="btn btn-outline-secondary btn-lg px-4 binge-font">Sign Up</button>
+        <div class="flex flex-col items-center">
+            <div class="bg-gray-300 w-full max-w-sm flex justify-start rounded-3xl py-2 my-4">  
+                <input type="text" placeholder="Find your next craving..." class="ml-4 bg-gray-300"></input>
+            </div>
+            <div class="w-full max-w-sm flex justify-center rounded-3xl overflow-hidden">
+                <gmp-map 
+                    center="49.282868, -123.125032" 
+                    zoom="14" 
+                    disable-default-ui="true"
+                    map-id="Downtown_Vancouver" 
+                    style="height: 400px"
+                ></gmp-map>
+            </div>
+            <div class="bg-gray-300 w-full max-w-sm flex flex-col justify-start rounded-3xl my-3 pt-2 pb-4">  
+                <div class="ml-5 mr-auto my-2 bg-white px-2 py-2 rounded-2xl font-bold">Suggested For You</div>
+                <div class="mx-5 bg-white px-2 py-2 rounded-2xl font-bold">
+                    <div class="flex flex-row justify-between">
+                        <p>Cactus Club Cafe</p>
+                        <p>0.5km</p>
+                    </div>
+                    <ul class="flex flex-row items-start justify-around font-normal my-2">
+                        <li class="mx-1 px-2 bg-gray-300 rounded-2xl">Menu</li>
+                        <li class="mx-1 px-2 bg-gray-300 rounded-2xl">Reserve</li>
+                        <li class="mx-1 px-2 bg-gray-300 rounded-2xl">Photos</li>
+                        <img src="./images/salmon.png" class="w-24 object-contain rounded-2xl">
+                    </ul>
                 </div>
+                <div></div>
             </div>
         </div>
     </main>
@@ -94,7 +104,13 @@
 
     <!-- Link to scripts of your own -->
     <script type="module" src="./src/main.js"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFKATIi_6NiTYc0ADgUKHJaFIwDrrPtWA&libraries=maps,marker"
+        defer
+    ></script>
 
 </body>
+
+
 
 </html>
