@@ -16,11 +16,17 @@
 
 </head>
 
-<body class="mx-auto max-w-screen-lg">
+<body class="mx-auto max-w-screen-lg my-3">
     <!-- Call to Action -->
 
     <div class="menu">
-        <a href="#"><img src="burger.svg" id="burger-menu"></a>
+        <button id="burgericon" class=" hover:bg-gray-400 rounded-lg"><img src="burger.svg" id="burger-menu"></button>
+        <div id="filters" class="hidden flex-col space-y-2">
+            <button type="button" class="btn btn-outline-secondary btn-lg px-4"> Distance </button>
+            <button type="button" class="btn btn-outline-secondary btn-lg px-4"> Price </button>
+            <button type="button" class="btn btn-outline-secondary btn-lg px-4"> Reviews </button>
+            <button type="button" class="btn btn-outline-secondary btn-lg px-4"> Cuisine </button>
+        </div>
     </div>
 
     <main>
