@@ -5,3 +5,6 @@ function sayHello() {
 
 }
 // document.addEventListener('DOMContentLoaded', sayHello);
+
+// Profile Page section // 
+
