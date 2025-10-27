@@ -14,11 +14,13 @@
     <link rel="stylesheet" href="./styles/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Orbitron:wght@400..900&display=swap"
+        rel="stylesheet">
 
 </head>
 
-<body class="mx-auto max-w-screen-lg">
+<body class="mx-auto max-w-screen-lg my-2">
     <!-- Call to Action -->
 
     <div class="menu flex flex-row justify-between overflow-hidden">
@@ -27,19 +29,14 @@
     </div>
     <main>
         <div class="flex flex-col items-center">
-            <div class="bg-gray-300 w-full max-w-sm flex justify-start rounded-3xl py-2 my-4">  
+            <div class="bg-gray-300 w-full max-w-sm flex justify-start rounded-3xl py-2 my-4">
                 <input type="text" placeholder="Find your next craving..." class="ml-4 bg-gray-300"></input>
             </div>
             <div class="w-full max-w-sm flex justify-center rounded-3xl overflow-hidden">
-                <gmp-map 
-                    center="49.282868, -123.125032" 
-                    zoom="14" 
-                    disable-default-ui="true"
-                    map-id="Downtown_Vancouver" 
-                    style="height: 400px"
-                ></gmp-map>
+                <gmp-map center="49.282868, -123.125032" zoom="14" disable-default-ui="true" map-id="Downtown_Vancouver"
+                    style="height: 400px"></gmp-map>
             </div>
-            <div class="bg-gray-300 w-full max-w-sm flex flex-col justify-start rounded-3xl my-3 pt-2 pb-4">  
+            <div class="bg-gray-300 w-full max-w-sm flex flex-col justify-start rounded-3xl my-3 pt-2 pb-4">
                 <div class="ml-5 mr-auto my-2 bg-white px-2 py-2 rounded-2xl font-bold">Suggested For You</div>
                 <div class="mx-5 bg-white px-2 py-2 rounded-2xl font-bold">
                     <div class="flex flex-row justify-between">
@@ -106,8 +103,7 @@
     <script type="module" src="./src/main.js"></script>
     <script
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFKATIi_6NiTYc0ADgUKHJaFIwDrrPtWA&libraries=maps,marker"
-        defer
-    ></script>
+        defer></script>
 
 </body>
 
