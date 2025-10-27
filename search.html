@@ -21,12 +21,41 @@
 <body class="mx-auto max-w-screen-lg">
     <!-- Call to Action -->
 
-    <div class="menu">
+    <div class="menu flex flex-row justify-between overflow-hidden">
+        <img src="./images/binge invis.png" width="100" class="object-contain pl-3">
         <a href="#"><img src="burger.svg" id="burger-menu"></a>
     </div>
-
     <main>
-        
+        <div class="flex flex-col items-center">
+            <div class="bg-gray-300 w-full max-w-sm flex justify-start rounded-3xl py-2 my-4">  
+                <p class="pl-6">Find your next craving...</p>
+            </div>
+            <div class="w-full max-w-sm flex justify-center rounded-3xl overflow-hidden">
+                <gmp-map 
+                    center="49.282868, -123.125032" 
+                    zoom="14" 
+                    disable-default-ui="true"
+                    map-id="Downtown_Vancouver" 
+                    style="height: 400px"
+                ></gmp-map>
+            </div>
+            <div class="bg-gray-300 w-full max-w-sm flex flex-col justify-start rounded-3xl my-3 pt-2 pb-4">  
+                <div class="ml-5 mr-auto my-2 bg-white px-2 py-2 rounded-2xl font-bold">Suggested For You</div>
+                <div class="mx-5 bg-white px-2 py-2 rounded-2xl font-bold">
+                    <div class="flex flex-row justify-between">
+                        <p>Cactus Club Cafe</p>
+                        <p>0.5km</p>
+                    </div>
+                    <ul class="flex flex-row items-start justify-around font-normal my-2">
+                        <li class="mx-1 px-2 bg-gray-300 rounded-2xl">Menu</li>
+                        <li class="mx-1 px-2 bg-gray-300 rounded-2xl">Reserve</li>
+                        <li class="mx-1 px-2 bg-gray-300 rounded-2xl">Photos</li>
+                        <img src="./images/salmon.png" class="w-24 object-contain rounded-2xl">
+                    </ul>
+                </div>
+                <div></div>
+            </div>
+        </div>
     </main>
 
     <footer>
@@ -75,7 +104,13 @@
 
     <!-- Link to scripts of your own -->
     <script type="module" src="./src/main.js"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFKATIi_6NiTYc0ADgUKHJaFIwDrrPtWA&libraries=maps,marker"
+        defer
+    ></script>
 
 </body>
+
+
 
 </html>
