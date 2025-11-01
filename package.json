@@ -13,6 +13,7 @@
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.8",
+    "firebase": "^12.5.0",
     "tailwind": "^2.3.1"
   }
 }

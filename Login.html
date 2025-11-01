@@ -1,39 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Binge Login</title>
     <link rel="stylesheet" href="./styles/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="src/authentication.js"></script>
+    <script type="module" src="src/firebaseConfig.js"></script>
+    <script type="module" src="src/login.js"></script>
 </head>
 
 <body class="binge-font">
-    
-    <div class="loginlogo">
-        <img src="images/binge invis.png">
-    </div>
 
-    <div class="loginBox">
+    <div id="loginView" class="loginBox">
+        <div class="loginlogo">
+            <img src="images/binge invis.png" alt="Binge Logo">
+        </div>
         <p class="text-4xl" style="margin-bottom: 10px;">LOGIN:</p>
-        <form id="inputfields">
-            <label for="Username">Username:</label>
+        <div id="authAlert" class="alert alert-danger d-none" role="alert"></div>
+
+        <form id="loginForm">
+            <label for="loginEmail">Email:</label>
             </br>
-            <input type="text" class="loginput" name="Username">
+            <input type="email" class="loginput" name="email" id="loginEmail" required>
             </br>
             </br>
-            <label for="Email">Password:</label>
+
+            <label for="loginPassword">Password:</label>
             </br>
-            <input type="password" class="loginput" name="Email">
+            <input type="password" class="loginput" name="password" id="loginPassword" required>
+            </br>
+            </br>
+
+            <button type="submit" class="loginButton btn-primary btn-lg px-4 gap-3 binge-font">Login</button>
         </form>
-        </br>
-        <a href="#"><button type="button" class="loginButton btn-primary btn-lg px-4 gap-3 binge-font">Login</button></a>
+
+        <small class="d-block mt-3 text-center">
+            Don't have an account?
+            <a href="#" id="toSignup">Sign up</a>
+        </small>
     </div>
 
-    <div class="flex justify-center">
-        <p style="margin-right: 5px;">Don't have an account?</p>
-        <a href="signup.html">Sign up here!</a>
+    <div id="signupView" class="loginBox d-none">
+        <p class="text-4xl" style="margin-bottom: 10px;">SIGN-UP:</p>
+
+        <div id="authAlert" class="alert alert-danger d-none"></div>
+
+        <form id="signupForm">
+            <label for="signupName">Create Username:</label>
+            <br>
+            <input type="text" id="signupName" class="loginput" name="username" required>
+            <br><br>
+
+            <label for="signupEmail">Email:</label>
+            <br>
+            <input type="email" id="signupEmail" class="loginput" name="email" required>
+            <br><br>
+
+            <label for="signupPassword">Create Password:</label>
+            <br>
+            <input type="password" id="signupPassword" class="loginput" name="password" required>
+            <br><br>
+
+            <label for="signupConfirmPassword">Confirm Password:</label>
+            <br>
+            <input type="password" id="signupConfirmPassword" class="loginput" name="confirmPassword" required>
+            <br><br>
+
+            <button type="submit" class="loginButton btn-primary btn-lg px-4 gap-3 binge-font">Sign Up!</button>
+        </form>
+
+        <small class="d-block mt-3 text-center">
+            Already have an account?
+            <a href="#" id="toLogin">Login</a>
+        </small>
     </div>
 
+    <script type="module" src="src/app.js"></script>
 </body>
+
 </html>
