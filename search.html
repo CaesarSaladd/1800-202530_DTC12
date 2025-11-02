@@ -23,9 +23,16 @@
 <body class="mx-auto max-w-screen-lg my-2">
     <!-- Call to Action -->
 
-    <div class="menu flex flex-row justify-between overflow-hidden">
+    <div class="menu flex flex-row justify-between overflow-visible relative z-[9999]">
         <img src="./images/binge invis.png" width="100" class="object-contain pl-3">
-        <a href="#"><img src="burger.svg" id="burger-menu"></a>
+        <div class="relative">
+            <button onclick="myDropdown()" class="flex hover:bg-gray-400 rounded-lg place-content-end z-[9999] relative"><img src="burger.svg" id="burger-menu"></button>
+            <ul id="myDropdown" class="hidden absolute right-0 mt-2 bg-white shadow-lg rounded-lg w-40 z-[10000]">
+                <li class="pr-4 py-2">Cuisine</li>
+                <li class="pr-4 py-2">Reviews</li>
+                <li class="pr-4 py-2">Price</li>
+            </ul>
+        </div>
     </div>
     <main>
         <div class="flex flex-col items-center">
@@ -37,20 +44,12 @@
                     style="height: 400px"></gmp-map>
             </div>
             <div class="bg-gray-300 w-full max-w-sm flex flex-col justify-start rounded-3xl my-3 pt-2 pb-4">
-                <div class="flex flex-row mr-auto ml-6 my-2 bg-white px-2 py-2 rounded-2xl font-bold">Suggested For You</div>
-                <div class="mx-auto bg-white px-2 py-2 rounded-2xl font-bold">
-                    <div class="flex flex-row justify-between"">
-                        <div>Cactus Club Cafe</div>
-                        <div>0.5km</div>
-                    </div>
-                    <div class="flex flex-row items-start justify-around font-normal my-2">
-                        <div class="mx-1 px-2 bg-gray-300 rounded-2xl">Menu</div>
-                        <div class="mx-1 px-2 bg-gray-300 rounded-2xl">Reserve</div>
-                        <div class="mx-1 px-2 bg-gray-300 rounded-2xl">Photos</div>
-                        <img src="./images/salmon.png" class="w-24 object-contain rounded-2xl">
-                    </div>
+                <div id="filterTitle" class="flex flex-row mr-auto ml-6 my-2 bg-white px-2 py-2 rounded-2xl font-bold">
+                    Suggested For You
                 </div>
-                <div></div>
+
+                <div id="resultsContainer" class="flex flex-col items-center gap-3 px-2 py-2">
+                </div>
             </div>
         </div>
     </main>
