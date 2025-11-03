@@ -14,67 +14,69 @@
     <link rel="stylesheet" href="./styles/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Orbitron:wght@400..900&display=swap"
+        rel="stylesheet">
 
 </head>
 
-<body class="mx-auto max-w-screen-lg">
+<body class="mx-auto max-w-screen-lg my-2">
     <!-- Call to Action -->
 
-    <div class="menu flex flex-row justify-between overflow-hidden">
+    <div class="menu flex flex-row justify-between overflow-visible relative z-[9999]">
         <img src="./images/binge invis.png" width="100" class="object-contain pl-3">
-        <a href="#"><img src="burger.svg" id="burger-menu"></a>
+        <div class="relative">
+            <button onclick="myDropdown()" class="flex hover:bg-gray-400 rounded-lg place-content-end z-[9999] relative"><img src="burger.svg" id="burger-menu"></button>
+            <ul id="myDropdown" class="hidden absolute right-0 mt-2 bg-white shadow-lg rounded-lg w-40 z-[10000]">
+                <li class="pr-4 py-2">Cuisine</li>
+                <li class="pr-4 py-2">Reviews</li>
+                <li class="pr-4 py-2">Price</li>
+            </ul>
+        </div>
     </div>
     <main>
         <div class="flex flex-col items-center">
-            <div class="bg-gray-300 w-full max-w-sm flex justify-start rounded-3xl py-2 my-4">  
+            <div class="bg-gray-300 w-full max-w-sm flex justify-start rounded-3xl py-2 my-4">
                 <input type="text" placeholder="Find your next craving..." class="ml-4 bg-gray-300"></input>
             </div>
             <div class="w-full max-w-sm flex justify-center rounded-3xl overflow-hidden">
-                <gmp-map 
-                    center="49.282868, -123.125032" 
-                    zoom="14" 
-                    disable-default-ui="true"
-                    map-id="Downtown_Vancouver" 
-                    style="height: 400px"
-                ></gmp-map>
+                <gmp-map center="49.282868, -123.125032" zoom="14" disable-default-ui="true" map-id="Downtown_Vancouver"
+                    style="height: 400px"></gmp-map>
             </div>
-            <div class="bg-gray-300 w-full max-w-sm flex flex-col justify-start rounded-3xl my-3 pt-2 pb-4">  
-                <div class="ml-5 mr-auto my-2 bg-white px-2 py-2 rounded-2xl font-bold">Suggested For You</div>
-                <div class="mx-5 bg-white px-2 py-2 rounded-2xl font-bold">
-                    <div class="flex flex-row justify-between">
-                        <p>Cactus Club Cafe</p>
-                        <p>0.5km</p>
-                    </div>
-                    <ul class="flex flex-row items-start justify-around font-normal my-2">
-                        <li class="mx-1 px-2 bg-gray-300 rounded-2xl">Menu</li>
-                        <li class="mx-1 px-2 bg-gray-300 rounded-2xl">Reserve</li>
-                        <li class="mx-1 px-2 bg-gray-300 rounded-2xl">Photos</li>
-                        <img src="./images/salmon.png" class="w-24 object-contain rounded-2xl">
-                    </ul>
+            <div class="bg-gray-300 w-full max-w-sm flex flex-col justify-start rounded-3xl my-3 pt-2 pb-4">
+                <div id="filterTitle" class="flex flex-row mr-auto ml-6 my-2 bg-white px-2 py-2 rounded-2xl font-bold">
+                    Suggested For You
                 </div>
-                <div></div>
+
+                <div id="resultsContainer" class="flex flex-col items-center gap-3 px-2 py-2">
+                </div>
             </div>
         </div>
     </main>
 
     <footer>
-        <div class="footericons">
-            <div class="ficons px-2 md:px-4 mx-3 border-2 border-faded border-gray-600 rounded-lg">
-                <svg class="h-12 w-12 p-1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                    fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
-                    <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
-                    <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
-                </svg>
-            </div>
-            <div class="ficons px-2 md:px-4 mx-3 border-2 border-faded border-gray-600 rounded-lg">
-                <svg class="h-12 w-12 p-1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                    fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
-                    <path d="M21 21l-6 -6" />
-                </svg>
-            </div>
+        <a href="index.html"></a>
+            <div class="footericons">
+                <div class="ficons px-2 md:px-4 mx-3 border-2 border-faded border-gray-600 rounded-lg">
+                    <svg class="h-12 w-12 p-1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                        fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
+                        <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+                        <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+                    </svg>
+                </div>
+        </a>    
+            <a href="search.html">
+                <div
+                    class=" hover:bg-gray-400 ficons px-2 md:px-4 mx-3 border-2 border-faded border-gray-600 rounded-lg">
+                    <svg class="h-12 w-12 p-1" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                        viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+                        <path d="M21 21l-6 -6" />
+                    </svg>
+                </div>
+            </a>
             <div class="ficons px-2 md:px-4 mx-3 border-2 border-faded border-gray-600 rounded-lg">
                 <svg class="h-12 w-12 p-1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
                     fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
@@ -82,22 +84,29 @@
                     <path d="M12 3l1.465 1.638a2 2 0 1 1 -3.015 .099l1.55 -1.737z" />
                 </svg>
             </div>
-            <div class="ficons px-2 md:px-4 mx-3 border-2 border-faded border-gray-600 rounded-lg">
-                <svg class="h-12 w-12 p-1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                    fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-                    <path d="M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
-                    <path d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855" />
-                </svg>
-            </div>
-            <div class="px-2 md:px-4 mx-3 border-2 border-faded border-gray-600 rounded-lg">
-                <svg class="h-12 w-12 p-1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                    fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                    <path
-                        d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" />
-                    <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
-                </svg>
-            </div>
+            <a href="profile.html">
+                <div id="ProfileIcon"
+                    class="hover:bg-gray-400 ficons px-2 md:px-4 mx-3 border-2 border-faded border-gray-600 rounded-lg">
+                    <svg class="h-12 w-12 p-1" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                        viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                        <path d="M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                        <path d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855" />
+                    </svg>
+                </div>
+            </a>
+            <a href="settings.html">
+                <div class=" hover:bg-gray-400 px-2 md:px-4 mx-3 border-2 border-faded border-gray-600 rounded-lg">
+                    <svg class="h-12 w-12 p-1" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                        viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path
+                            d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" />
+                        <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                    </svg>
+                </div>
+            </a>
         </div>
     </footer>
 
@@ -106,8 +115,7 @@
     <script type="module" src="./src/main.js"></script>
     <script
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFKATIi_6NiTYc0ADgUKHJaFIwDrrPtWA&libraries=maps,marker"
-        defer
-    ></script>
+        defer></script>
 
 </body>
 
