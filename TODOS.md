@@ -1,0 +1,1 @@
+- add "LOGOUT" button
