@@ -1,7 +1,56 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
+import { auth } from "./firebaseConfig.js";
 import { db } from "./firebaseConfig.js";
 import { collection, getDocs, addDoc, serverTimestamp, query, where } from "firebase/firestore";
+
+
+async function addToCrave(parentElement, restaurantData) {
+  auth.onAuthStateChanged(async (user) => {
+    let userId;
+
+    if (user) {
+      userId = user.uid;
+    } else {
+      userId = "guestUser";
+    }
+
+    let addToCraves = document.createElement("button");
+    addToCraves.className = "h-6 w-6 px-2 text-blue-400 rounded-lg hover:bg-orange-300 font-bold";
+    addToCraves.innerHTML = "+";
+
+    addToCraves.addEventListener("click", async () => {
+      try {
+        let cravesRef = collection(db, "users", userId, "craves");
+
+        // Check if this restaurant is already in the user's Craves
+        let currentDoc = await getDocs(cravesRef);
+
+        // Check if any documents were returned
+        let isAlreadyInCraves = currentDoc.docs.some(doc => doc.data().name === restaurantData.name);
+
+        if (isAlreadyInCraves) {
+          alert(`${restaurantData.name} is already in your Craves.`);
+          return;
+        }
+
+        // Add to Firestore
+        await addDoc(cravesRef, {
+          name: restaurantData.name,
+          address: restaurantData.formattedAddress || "No address available",
+          rating: restaurantData.rating || "N/A",
+          added_at: serverTimestamp(),
+        });
+
+        alert(`${restaurantData.name} added to your Craves!`);
+      } catch (error) {
+        alert("Failed to add to Craves. Please try again.");
+      }
+    });
+
+    parentElement.appendChild(addToCraves);
+  });
+}
 
 
 // --- SEED FILTERS (if empty) ---
@@ -134,7 +183,7 @@ async function findNearbyRestaurants(location, keyword) {
   const request = {
     textQuery: keyword ? `${keyword} restaurant` : "restaurants near me",
     fields: ["displayName", "formattedAddress", "location", "rating"],
-    locationBias: { center: latLng, radius: 1500 }, 
+    locationBias: { center: latLng, radius: 1500 },
   };
 
   try {
@@ -161,10 +210,18 @@ async function findNearbyRestaurants(location, keyword) {
       const card = document.createElement("div");
       card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
       card.innerHTML = `
-        <h3 class="font-bold">${place.displayName}</h3>
+        <div class = "flex justify-between mb-2> <h3 class="font-bold">${place.displayName}</h3>  </div>
+        
         <p>${place.formattedAddress || "No address available"}</p>
         <p class="text-yellow-600">⭐ ${place.rating || "N/A"}</p>
       `;
+      const headerDiv = card.querySelector("div");
+      addToCrave(headerDiv, {
+        name: place.displayName,
+        formattedAddress: place.formattedAddress,
+        rating: place.rating,
+        distance: place.distance,
+      });
       container.appendChild(card);
     });
   } catch (err) {
@@ -173,6 +230,7 @@ async function findNearbyRestaurants(location, keyword) {
       `<p class="text-gray-600">Error retrieving restaurants.</p>`;
   }
 }
+
 
 
 
@@ -192,7 +250,7 @@ async function initMap() {
   const startSearch = (loc) => {
     userLocation = loc || defaultLoc;
     map.setCenter(userLocation);
-    
+
     google.maps.event.addListenerOnce(map, "idle", () => {
       findNearbyRestaurants(userLocation, "");
     });
