@@ -13,7 +13,13 @@
 
 <body class="mx-auto max-w-screen-lg my-2">
     <header class="flex flex-col items-center mb-10">
-        <img src="./images/binge_invis.png" width="100">
+        <div class="flex flex-row justify-between">
+            <img src="./images/binge_invis.png" width="100">
+            <button id="logoutBtn" class="px-4 py-2 bg-orange-300 rounded-lg hover:bg-orange-500 text-black font-semibold">
+                Logout
+            </button>
+        </div>
+
         <div
             class="flex items-center justify-center w-1/2 px-2 my-3 md:px-4 mx-3 border-2 border-faded border-gray-600 rounded-lg">
             <svg class="h-36 w-36 p-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -165,6 +171,8 @@
             </a>
         </div>
     </footer>
+    <script type="module" src="./src/profile.js"></script>
+
 
 </body>
 
