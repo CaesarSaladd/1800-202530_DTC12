@@ -21,7 +21,7 @@ function initAuthUI() {
     const toLoginBtn = document.getElementById('toLogin');
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupForm');
-    const redirectUrl = 'search.html';
+    const redirectUrl = './search.html';
 
     // --- Helper Functions ---
     // Toggle element visibility
@@ -99,7 +99,7 @@ function initAuthUI() {
         const email = document.querySelector('#signupEmail')?.value?.trim() ?? '';
         const password = document.querySelector('#signupPassword')?.value ?? '';
         if (!name || !email || !password) {
-            showError('Please fill in name, email, and password.');
+            showError('Please ensure all fields are filled.');
             return;
         }
         setSubmitDisabled(signupForm, true);
