@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="./styles/style.css">
+    <script type="module" src="src/profile.js"></script>
 
     <title>Document</title>
 </head>
@@ -58,20 +59,26 @@
 
         </section>
 
-        <section id="profCraves" class="my-6">
-            <section id="profReviews" class="flex flex-col">
-                <h1 class="mb-3 ml-2 text-3xl font-bold tracking-tight">Craves</h1>
-                <div id="craves-list" class="craves-container"></div>
-            </section>
+        <h1 class="flex justify-start my-5 ml-2 text-3xl font-bold tracking-tight"> Craves </h1>
+        <section id="profCraves" class="flex gap-x-2 max-w-full overflow-x-auto">
+            <template id="craves" class="flex space-x-3 flex-nowrap">
+                <div class="w-64 flex-shrink-0 p-6 border-2 border-faded border-gray-600 rounded-lg">
+                    <h5 class="craveName mb-2 text-2xl font-semibold tracking-tight text-gray-900"></h5>
+                    <p
+                        class="craveReview flex justify-center mt-auto font-bold text-gray-700 border-2 rounded-full border-gray-600">
+                    </p>
+                    <p class="craveAddress text-gray-700"></p>
+                </div>
+            </template>
         </section>
 
 
-        </section>
-        <section id="profLeftovers" class="my-6">
+        <section id="profLeftovers" class="flex flex-col max-w-full">
             <h1 class="mb-3 ml-2 text-3xl font-bold tracking-tight"> Leftovers </h1>
-            <div class="flex space-x-3">
+            <div class="flex space-x-3 flex-nowrap overflow-x-auto">
                 <a href="#" class="max-w-96 p-6  border-2 border-faded border-gray-600 rounded-lg">
-                    <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white"> Leftovers
+                    <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900"> Restaurant
+                        Name
                     </h5>
                     <p class="font-normal text-gray-700"> Lorem ipsum dolor sit amet consectetur
                         adipisicing elit. Laudantium harum in, eveniet dolorem quaerat sint deserunt vero omnis
@@ -79,7 +86,8 @@
                         commodi!</p>
                 </a>
                 <a href="#" class="max-w-96 max p-6  border-2 border-faded border-gray-600 rounded-lg">
-                    <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white"> Leftovers
+                    <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900"> Restaurant
+                        Name
                     </h5>
                     <p class="font-normal text-gray-700"> Lorem ipsum dolor sit amet consectetur
                         adipisicing elit. Laudantium harum in, eveniet dolorem quaerat sint deserunt vero omnis
@@ -87,7 +95,8 @@
                         commodi!</p>
                 </a>
                 <a href="#" class="max-w-96 max p-6  border-2 border-faded border-gray-600 rounded-lg">
-                    <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white"> Leftovers
+                    <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900"> Restaurant
+                        Name
                     </h5>
                     <p class="font-normal text-gray-700"> Lorem ipsum dolor sit amet consectetur
                         adipisicing elit. Laudantium harum in, eveniet dolorem quaerat sint deserunt vero omnis
@@ -95,7 +104,6 @@
                         commodi!</p>
                 </a>
             </div>
-
 
         </section>
     </main>
