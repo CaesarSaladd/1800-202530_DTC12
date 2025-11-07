@@ -15,7 +15,8 @@
     <header class="flex flex-col items-center mb-10">
         <div class="flex flex-row justify-between">
             <img src="./images/binge_invis.png" width="100">
-            <button id="logoutBtn" class="px-4 py-2 bg-orange-300 rounded-lg hover:bg-orange-500 text-black font-semibold">
+            <button id="logoutBtn"
+                class="px-4 py-2 bg-orange-300 rounded-lg hover:bg-orange-500 text-black font-semibold">
                 Logout
             </button>
         </div>
@@ -65,13 +66,18 @@
 
         </section>
 
-        <h1 class="flex justify-start my-5 ml-2 text-3xl font-bold tracking-tight"> Craves </h1>
-        <section id="profCraves" class="flex gap-x-2 max-w-full overflow-x-auto">
-            <template id="craves" class="flex space-x-3 flex-nowrap">
-                <div class="w-64 flex-shrink-0 p-6 border-2 border-faded border-gray-600 rounded-lg">
-                    <h5 class="craveName mb-2 text-2xl font-semibold tracking-tight text-gray-900"></h5>
+        <div class="w-full">
+            <h1 class="flex justify-start my-5 ml-2 text-3xl font-bold tracking-tight"> Craves </h1>
+        </div>
+        <section id="profCraves" class="flex gap-x-3 mb-4 max-w-full overflow-x-auto">
+            <template id="craves" class="flex space-x-8 flex-nowrap">
+                <div class="w-80 flex-shrink-0 p-6 border-2 border-faded border-gray-600 rounded-lg bg-orange-300">
+                    <div class="flex justify-between">
+                        <h5 class="craveName mb-2 text-2xl font-semibold tracking-tight text-gray-900"></h5>
+                        <button class="delButton flex align-top text-red-500"> Remove </button>
+                    </div>
                     <p
-                        class="craveReview flex justify-center mt-auto font-bold text-gray-700 border-2 rounded-full border-gray-600">
+                        class="craveReview flex justify-center tracking-wider mt-auto font-bold text-gray-700 border-2 rounded-full border-gray-600">
                     </p>
                     <p class="craveAddress text-gray-700"></p>
                 </div>
@@ -139,8 +145,9 @@
             </a>
             <a href="swipe.html">
                 <div class="ficons px-2 md:px-4 mx-3 border-2 border-faded border-gray-600 rounded-lg">
-                    <svg class="h-12 w-12 p-1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                        fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="h-12 w-12 p-1" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                        viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <path d="M9 21h6v-9a1 1 0 0 0 -1 -1h-4a1 1 0 0 0 -1 1v9z" />
                         <path d="M12 3l1.465 1.638a2 2 0 1 1 -3.015 .099l1.55 -1.737z" />
                     </svg>

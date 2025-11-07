@@ -7,7 +7,7 @@ import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 async function populateCrave() {
     auth.onAuthStateChanged(async (user) => {
         const craveCardTemplate = document.getElementById("craves");
-        const craveCardContainer = document.getElementById("profCraves");  // The container where craves will be appended
+        const craveCardContainer = document.getElementById("profCraves");
         let userId;
 
         if (user) {
@@ -24,19 +24,31 @@ async function populateCrave() {
             querySnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
                 let restaurantName = data.name;
-                let restaurantRating = data.rating || "N/A";  // Default to "N/A" if no rating
+                let restaurantRating = data.rating || "N/A";
                 let restaurantAddress = data.address || "N/A";
 
                 // Clone the template content
                 const craveCard = craveCardTemplate.content.cloneNode(true);
+                const wholeCard = craveCard.querySelector("div.w-80");
 
                 // Update the cloned content with the data from Firestore
                 craveCard.querySelector(".craveName").textContent = restaurantName;  // Update the restaurant name
                 craveCard.querySelector(".craveReview").textContent = restaurantRating;  // Update the restaurant rating
-                craveCard.querySelector(".craveAddress").textContent = restaurantAddress;
+                craveCard.querySelector(".craveAddress").textContent = restaurantAddress; // Update restaurant address
+                let deleteButton = craveCard.querySelector(".delButton")
 
-                // Append the cloned card to the container
-                craveCardContainer.appendChild(craveCard);
+                // Delete button, remove from database
+                deleteButton.addEventListener("click", async () => {
+                    try {
+                        await deleteDoc(doc(db, "users", userId, "craves", docSnap.id))
+                        wholeCard.remove();
+                    } catch (err) {
+                        console.log(err)
+                    }
+
+                })
+                // Append the to the container
+                craveCardContainer.appendChild(wholeCard);
             });
         } catch (error) {
             console.error("Error loading craves:", error);
