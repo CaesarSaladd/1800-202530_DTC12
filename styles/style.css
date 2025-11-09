@@ -10,6 +10,11 @@
 }
 
 .footericons {
+    padding: 20px;
+    background-color: white;
+    width: fit-content;
+    border-radius: 15px;
+    border-color: black;
     display: flex;
     flex-direction: row;
     flex-grow: inherit;
@@ -17,13 +22,12 @@
     align-items: flex-end;
     position: fixed;
     bottom: 0;
-    right: 25%;
-    left: 25%;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .ficons {
     margin-right: 20px;
-
 }
 
 .binge-font {
