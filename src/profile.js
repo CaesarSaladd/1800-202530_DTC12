@@ -60,4 +60,52 @@ async function populateCrave() {
     });
 }
 
+async function populateReview() {
+    auth.onAuthStateChanged(async (user) => {
+        if (!user) return;
+
+        const reviewCardTemplate = document.getElementById("reviews");
+        const reviewCardContainer = document.getElementById("profReviews");
+        const userId = user.uid;
+
+        try {
+            const revRef = collection(db, "users", userId, "reviews");
+            const querySnapshot = await getDocs(revRef);
+
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+
+                const restaurantName = data.restaurantName;
+                const restaurantRating = data.rating || "N/A";
+                const restaurantAddress = data.restaurantAddress || "N/A";
+                const restaurantDescription = data.description || "";
+
+                const reviewCard = reviewCardTemplate.content.cloneNode(true);
+                const wholeCard = reviewCard.querySelector("div.w-80");
+
+                reviewCard.querySelector(".reviewName").textContent = restaurantName;
+                reviewCard.querySelector(".reviewRating").textContent = restaurantRating;
+                reviewCard.querySelector(".reviewAddress").textContent = restaurantAddress;
+                reviewCard.querySelector(".reviewDescription").textContent = restaurantDescription;
+
+                const deleteButton = reviewCard.querySelector(".delButton");
+                deleteButton.addEventListener("click", async () => {
+                    try {
+                        await deleteDoc(doc(db, "users", userId, "reviews", docSnap.id));
+                        wholeCard.remove();
+                    } catch (err) {
+                        console.log(err);
+                    }
+                });
+
+                reviewCardContainer.appendChild(wholeCard);
+            });
+
+        } catch (error) {
+            console.error("Error loading reviews:", error);
+        }
+    });
+}
+
 populateCrave();
+populateReview();

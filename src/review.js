@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     manageStars();
 });
 
-let hikeRating = 0;
+let restaurantRating = 0;
 function manageStars() {
     // ⭐ Make star icons clickable and calculate rating
     const stars = document.querySelectorAll('.star');
@@ -46,30 +46,23 @@ function manageStars() {
                 s.textContent = i <= index ? 'star' : 'star_outline';
             });
             // Save rating value
-            hikeRating = index + 1;
-            console.log("Current rating:", hikeRating);
+            restaurantRating = index + 1;
+            console.log("Current rating:", restaurantRating);
         });
     });
 }
-
-
 
 async function writeReview() {
     console.log("Inside write review");
 
     // 🧾 Collect form data
-    const hikeDescription = document.getElementById("description").value;
-    const hikeFlooded = document.querySelector('input[name="flooded"]:checked')?.value;
-    const hikeScrambled = document.querySelector('input[name="scrambled"]:checked')?.value;
+    const restaurantDescription = document.getElementById("description").value;
 
     // Log collected data for verification
-    console.log("inside write review, rating =", hikeRating);
-    console.log("hikeDocID =", hikeDocID);
-    console.log("Collected review data:");
-    console.log(hikeTitle, hikeLevel, hikeSeason, hikeDescription, hikeFlooded, hikeScrambled);
+    console.log("inside write review, rating =", restaurantRating);
 
     // simple validation
-    if (!hikeTitle || !hikeDescription) {
+    if (!restaurantDescription) {
         alert("Please complete all required fields.");
         return;
     }
@@ -84,35 +77,47 @@ async function writeReview() {
             // Extra: Let’s toss in the server timestamp as well.   
             // We can do this with one extra line of code.   
             // Reference: https://cloud.google.com/firestore/docs/manage-data/add-data#server_timestamp 
-            await addDoc(collection(db, "reviews"), {
-                hikeDocID: hikeDocID,   // make sure hikeDocID is defined globally or passed in
+
+            const restaurantRef = doc(db, "users", userID, "craves", restaurantDocID);
+            const restaurantSnap = await getDoc(restaurantRef);
+
+            if (!restaurantSnap.exists()) {
+                console.error("Restaurant data not found.");
+                return;
+            }
+
+            const restaurantData = restaurantSnap.data();
+            const restaurantName = restaurantData.name;
+            const restaurantAddress = restaurantData.address;
+
+
+            await addDoc(collection(db, "users", userID, "reviews"), {
+                restaurantDocID: restaurantDocID,
+                restaurantName: restaurantName,
+                restaurantAddress: restaurantAddress,
                 userID: userID,
-                title: hikeTitle,
-                level: hikeLevel,
-                season: hikeSeason,
-                description: hikeDescription,
-                flooded: hikeFlooded,
-                scrambled: hikeScrambled,
-                rating: hikeRating,
+                description: restaurantDescription,
+                rating: restaurantRating,
                 timestamp: serverTimestamp()
             });
 
             console.log("Review successfully written!");
 
-            window.location.href = `eachHike.html?docID=${hikeDocID}`;
+            window.location.href = "profile.html";
 
-            // 🎉 Optional: Say thank-you in a new page
-            //window.location.href = "thanks.html"; // redirect to thank-you page
-
-            // 🎉 Optional: Show thank-you modal instead of redirect
-            const thankYouModal = new bootstrap.Modal(document.getElementById("thankYouModal"));
-            thankYouModal.show();
 
         } catch (error) {
             console.error("Error adding review:", error);
         }
     } else {
         console.log("No user is signed in");
-        //window.location.href = "review.html";
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    manageStars();
+
+    // 👇👇👇 Add these two lines
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.addEventListener('click', writeReview);
+});
