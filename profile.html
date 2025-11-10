@@ -13,13 +13,14 @@
 </head>
 
 <body class="mx-auto max-w-screen-lg my-2">
-    <header class="flex flex-col items-center mb-10">
-        <div class="flex flex-row justify-between">
-            <img src="./images/binge_invis.png" width="100">
-            <button id="logoutBtn"
-                class="px-4 py-2 bg-orange-300 rounded-lg hover:bg-orange-500 text-black font-semibold">
-                Logout
-            </button>
+
+    <header class="flex flex-col items-center mb-10 relative">
+        <div class="relative w-full flex items-center justify-center">
+            <img src="./images/binge_invis.png" width="100" class="mx-auto">
+
+            <a href="settings.html" class="absolute right-4 top-1/2 -translate-y-1/2">
+                <img src="images/settings.svg" id="settingsIcon" class="w-6 h-6">
+            </a>
         </div>
 
         <div
@@ -32,6 +33,7 @@
             </svg>
         </div>
     </header>
+    
     <main class="flex flex-col justify-center items-center overflow-y-auto">
         <section id="profReviews" class="flex flex-col max-w-full">
             <h1 class="mb-3 ml-2 text-3xl font-bold tracking-tight"> Reviews </h1>

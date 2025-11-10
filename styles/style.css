@@ -9,12 +9,16 @@
     height: 60px;
 }
 
+#settingsIcon {
+    width: 50px;
+    height: 50px;
+}
+
 .footericons {
     padding: 20px;
     background-color: white;
     width: fit-content;
     border-radius: 15px;
-    border-color: black;
     display: flex;
     flex-direction: row;
     flex-grow: inherit;
