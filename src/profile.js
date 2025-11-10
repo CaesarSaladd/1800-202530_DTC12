@@ -107,5 +107,14 @@ async function populateReview() {
     });
 }
 
+document.addEventListener("click", (event) => {
+    // If a dropdown button was clicked, toggle that dropdown
+    const button = event.target.closest(".dropdownBtn");
+    if (button) {
+        const dropdown = button.nextElementSibling;
+        dropdown.classList.toggle("hidden");
+    }
+});
+
 populateCrave();
 populateReview();
