@@ -35,6 +35,7 @@ async function populateCrave() {
                 craveCard.querySelector(".craveReview").textContent = restaurantRating;  // Update the restaurant rating
                 craveCard.querySelector(".craveAddress").textContent = restaurantAddress; // Update restaurant address
                 let deleteButton = craveCard.querySelector(".delButton")
+                let reviewButton = craveCard.querySelector(".reviewButton")
 
                 // Delete button, remove from database
                 deleteButton.addEventListener("click", async () => {
@@ -46,6 +47,10 @@ async function populateCrave() {
                     }
 
                 })
+                craveCard.querySelector(".writeReviewBtn").addEventListener("click", () => {
+                    localStorage.setItem('restaurantDocID', docSnap.id);
+                    window.location.href = 'review.html';
+                });
                 // Append the to the container
                 craveCardContainer.appendChild(wholeCard);
             });
