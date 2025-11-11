@@ -1,5 +1,4 @@
-import { auth } from "./firebaseConfig.js";
-import { db } from "./firebaseConfig.js";
+import { db, auth } from "./firebaseConfig.js";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 
 

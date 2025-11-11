@@ -5,19 +5,33 @@ import {
 } from "firebase/auth";
 
 
+const auth = getAuth();
+const usernameDisplay = document.getElementById('usernameDisplay');
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        const username = user.displayName || user.email
+        usernameDisplay.textContent = username
+    } else {
+        console.log('no user logged in')
+    }
+})
 
 
 // ---------------
 // | signing out |
 // ---------------
-const logoutButton = document.getElementById('logoutButton')
+const logoutBtn = document.getElementById('logoutButton')
 
-logoutButton.addEventListener("click", () => {
-    signOut(auth)
-    .then(() => {
-        window.location.assign('/index')
+if (logoutBtn)
+{
+    logoutBtn.addEventListener("click", () => {
+        signOut(auth)
+        .then(() => {
+            window.location.assign('/index')
+        })
+        .catch((error) => {
+            console.error('Error signing out:', error)
+        })
     })
-    .catch((error) => {
-        console.error('Error signing out:', error)
-    })
-})
+}
