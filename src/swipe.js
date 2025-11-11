@@ -159,7 +159,6 @@ onAuthStateChanged(auth, async (user) => {
         status.textContent = "";
     });
 
-    // Swiping left or right
     stack.on("throwout", async (e) => {
         const restaurantName = e.target.querySelector("h2").textContent;
         const address = e.target.querySelector("p").textContent;
@@ -168,29 +167,30 @@ onAuthStateChanged(auth, async (user) => {
 
         const isCrave = e.throwDirection === Direction.RIGHT;
         const targetCollection = isCrave ? "craves" : "leftovers";
-        const action = isCrave ? "Crave" : "Leftover";
 
         // Show feedback text
         status.textContent = isCrave
             ? `You crave ${restaurantName}!`
             : `You left ${restaurantName} as leftovers!`;
 
-        // Save swipe result under user’s subcollection
+        // Check if restaurant already exists in that collection
         const userRef = collection(db, "users", user.uid, targetCollection);
-        await addDoc(userRef, {
-            name: restaurantName,
-            address,
-            rating,
-            added_at: serverTimestamp(),
-        });
+        const existingDocs = await getDocs(userRef);
+        const alreadyExists = existingDocs.docs.some(
+            (doc) => doc.data().name === restaurantName
+        );
 
-        // Optionally: record swipe action globally for analytics
-        await addDoc(collection(db, "swipes"), {
-            userId: user.uid,
-            restaurant: restaurantName,
-            action: targetCollection,
-            timestamp: serverTimestamp(),
-        });
+        if (alreadyExists) {
+            console.log(`${restaurantName} is already in your ${targetCollection}.`);
+        } else {
+            await addDoc(userRef, {
+                name: restaurantName,
+                address,
+                rating,
+                added_at: serverTimestamp(),
+            });
+            console.log(`${restaurantName} added to ${targetCollection}.`);
+        }
 
         // Remove the swiped card
         e.target.remove();
@@ -200,5 +200,6 @@ onAuthStateChanged(auth, async (user) => {
             status.textContent = "No more restaurants nearby!";
         }
     });
+
 
 });
