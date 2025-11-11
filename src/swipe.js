@@ -161,19 +161,34 @@ onAuthStateChanged(auth, async (user) => {
 
     // Swiping left or right
     stack.on("throwout", async (e) => {
-        const restaurant = e.target.querySelector("h2").textContent;
+        const restaurantName = e.target.querySelector("h2").textContent;
+        const address = e.target.querySelector("p").textContent;
+        const ratingElement = e.target.querySelector("span");
+        const rating = ratingElement ? ratingElement.textContent.replace("⭐ ", "") : "N/A";
+
         const isCrave = e.throwDirection === Direction.RIGHT;
-        const action = isCrave ? "crave" : "leftover";
+        const targetCollection = isCrave ? "craves" : "leftovers";
+        const action = isCrave ? "Crave" : "Leftover";
 
+        // Show feedback text
         status.textContent = isCrave
-            ? `You crave ${restaurant}!`
-            : `You left ${restaurant} as leftovers!`;
+            ? `You crave ${restaurantName}!`
+            : `You left ${restaurantName} as leftovers!`;
 
-        // Save swipe result to Firestore
+        // Save swipe result under user’s subcollection
+        const userRef = collection(db, "users", user.uid, targetCollection);
+        await addDoc(userRef, {
+            name: restaurantName,
+            address,
+            rating,
+            added_at: serverTimestamp(),
+        });
+
+        // Optionally: record swipe action globally for analytics
         await addDoc(collection(db, "swipes"), {
             userId: user.uid,
-            restaurant,
-            action,
+            restaurant: restaurantName,
+            action: targetCollection,
             timestamp: serverTimestamp(),
         });
 
@@ -185,4 +200,5 @@ onAuthStateChanged(auth, async (user) => {
             status.textContent = "No more restaurants nearby!";
         }
     });
+
 });
