@@ -2,6 +2,10 @@ import { auth, db } from "./firebaseConfig.js";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
 
+window.lastSearchResults = [];
+window.originalSearchResults = [];
+
+
 // --------- AUTH CHECK ----------
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -40,6 +44,10 @@ async function addToCrave(parentElement, restaurantData) {
 
 // --------- MAP + PLACES SETUP ----------
 let map, service, markers = [];
+let lastSearchKeyword = "";
+
+
+
 
 
 // Remove all markers from the map before new search results
@@ -74,15 +82,22 @@ async function findNearbyRestaurants(location, keyword) {
 
 
     service.textSearch(request, (results, status) => {
-        const container = document.getElementById("resultsContainer");
-        container.innerHTML = "";
-        clearMarkers();
+    const container = document.getElementById("resultsContainer");
+    container.innerHTML = "";
+    clearMarkers();
 
-        // Handle errors or empty results
-        if (status !== google.maps.places.PlacesServiceStatus.OK || !results?.length) {
-            container.innerHTML = `<p class="text-gray-600">No restaurants found.</p>`;
-            return;
-        }
+    // Handle errors or empty results
+    if (status !== google.maps.places.PlacesServiceStatus.OK || !results?.length) {
+        container.innerHTML = `<p class="text-gray-600">No restaurants found.</p>`;
+        window.lastSearchResults = [];
+        return;
+    }
+
+    // Save last search results + keyword for filters
+    window.lastSearchResults = results;
+    window.originalSearchResults = [...results];
+    lastSearchKeyword = keyword || "";
+
 
         // Loop through each returned restaurant
         results.forEach((place) => {
@@ -101,7 +116,7 @@ async function findNearbyRestaurants(location, keyword) {
                 <h3 class="font-bold">${place.name}</h3>
                 </div>
                 <p>${place.formatted_address || "No address available"}</p>
-                <p class="text-yellow-600">⭐ ${place.rating || "N/A"}</p>
+                <p class="text-yellow-600"> ${place.rating || "N/A"}</p>
             `;
             // Create an "Add to Craves" button
             const addButton = document.createElement("button");
@@ -181,4 +196,642 @@ async function initMap() {
     }
 
 }
+
+// --------- BURGER MENU + FILTERS ----------
+document.addEventListener("DOMContentLoaded", () => {
+    const burgerButton = document.getElementById("burger-menu");
+    const dropdown = document.getElementById("myDropdown");
+
+    let isDropdownOpen = false;
+
+    // Toggle dropdown
+    if (burgerButton && dropdown) {
+        burgerButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+
+        // Toggle visiblity of dropdown
+        const willOpen = dropdown.classList.contains("hidden");
+        dropdown.classList.toggle("hidden");
+        isDropdownOpen = willOpen;
+
+        // Reset transition when opened
+        if (willOpen) {
+            dropdown.classList.remove("opacity-0", "scale-95");
+            setTimeout(() => {
+            dropdown.classList.add("opacity-100", "scale-100");
+            }, 10);
+        } else {
+            dropdown.classList.remove("opacity-100", "scale-100");
+            dropdown.classList.add("opacity-0", "scale-95");
+        }
+        });
+
+        // Prevent clicks inside dropdown from closing it
+        dropdown.addEventListener("click", (event) => {
+        event.stopPropagation();
+        });
+
+        // Close dropdown only if click is outside both elements
+        document.addEventListener("click", (event) => {
+        if (
+            isDropdownOpen &&
+            !dropdown.contains(event.target) &&
+            !burgerButton.contains(event.target)
+        ) {
+            closeDropdown();
+        }
+        });
+    }
+
+    function closeDropdown() {
+        dropdown.classList.add("hidden");
+        dropdown.classList.remove("opacity-100", "scale-100");
+        dropdown.classList.add("opacity-0", "scale-95");
+        isDropdownOpen = false;
+    }
+
+    // Load filters from Firestore database
+    async function loadFilters() {
+        try {
+        const snapshot = await getDocs(collection(db, "filters"));
+        dropdown.innerHTML = "";
+
+        snapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            const li = document.createElement("li");
+            li.className = "px-4 py-2 hover:bg-gray-100 cursor-pointer";
+            li.textContent = data.filter;
+
+            if (data.filter.toLowerCase() === "cuisine") {
+            li.addEventListener("click", (event) => {
+                event.stopPropagation();
+                showCuisineOptions();
+            });
+            }
+
+            if (data.filter.toLowerCase() === "price") {
+                li.addEventListener("click", (event) => {
+                    event.stopPropagation();
+                    showPriceOptions();
+                });
+            }
+
+            dropdown.appendChild(li);
+        });
+        } catch (err) {
+        console.error("Error loading filters:", err);
+        dropdown.innerHTML =
+            '<li class="px-4 py-2 text-red-500">Failed to load filters</li>';
+        }
+    }
+
+        // Cusisine options
+    async function showCuisineOptions() {
+        dropdown.innerHTML = "";
+
+        const cuisines = [
+            "Italian",
+            "Japanese",
+            "Indian",
+            "Mexican",
+            "Chinese",
+            "Thai",
+            "Korean",
+            "Brazilian",
+            "Mediterranean",
+            "Soul Food",
+            "Fast Food"
+        ];
+
+        cuisines.forEach((cuisine) => {
+            const li = document.createElement("li");
+            li.className = "px-4 py-1 flex items-center hover:bg-gray-100";
+            li.innerHTML = `
+                <input type="checkbox" value="${cuisine}" class="mr-2 cursor-pointer checkbox-cuisine">
+                <span>${cuisine}</span>`;
+            dropdown.appendChild(li);
+        });
+
+        const btns = document.createElement("div");
+        btns.className = "flex justify-between px-4 py-2 border-t mt-2";
+        btns.innerHTML = `
+            <button id="backToFilters" class="text-gray-500 hover:text-gray-700 text-sm">← Back</button>
+            <button id="applyCuisine" class="bg-orange-400 text-white px-3 py-1 rounded-lg text-sm hover:bg-orange-500">Apply</button>
+        `;
+        dropdown.appendChild(btns);
+
+        document.getElementById("backToFilters").addEventListener("click", (e) => {
+            e.stopPropagation();
+            loadFilters();
+        });
+
+        document.getElementById("applyCuisine").addEventListener("click", (e) => {
+            e.stopPropagation();
+            const selected = [...document.querySelectorAll(".checkbox-cuisine:checked")].map((cb) => cb.value);
+
+            if (selected.length === 0) {
+                alert("Please select at least one cuisine.");
+                return;
+            }
+
+            console.log("Selected cuisines:", selected);
+
+            if (window.lastSearchResults.length > 0) {
+                filterExistingResultsByCuisine(selected);
+            } else {
+                // fallback: query Google if no prior search
+                const keyword = selected.join(", ");
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        pos => findNearbyRestaurants({ lat: pos.coords.latitude, lng: pos.coords.longitude }, keyword),
+                        () => findNearbyRestaurants({ lat: 49.282868, lng: -123.125032 }, keyword)
+                    );
+                } else {
+                    findNearbyRestaurants({ lat: 49.282868, lng: -123.125032 }, keyword);
+                }
+            }
+            closeDropdown();
+        });
+    }
+
+
+
+    // Price options
+    async function showPriceOptions() {
+        dropdown.innerHTML = ""; // clear filter list
+
+        const options = [
+            { label: "$ → $$$$", value: "asc" },
+            { label: "$$$$ → $", value: "desc" },
+        ];
+
+        options.forEach(option => {
+            const li = document.createElement("li");
+            li.className = "px-4 py-2 hover:bg-gray-100 cursor-pointer";
+            li.textContent = option.label;
+
+            li.addEventListener("click", (e) => {
+                e.stopPropagation();
+                sortByPrice(option.value);
+            });
+
+            dropdown.appendChild(li);
+        });
+
+        // Add "Back" button
+        const btnContainer = document.createElement("div");
+        btnContainer.className = "flex justify-start px-4 py-2 border-t mt-2";
+        btnContainer.innerHTML = `
+            <button id="backToFilters" class="text-gray-500 hover:text-gray-700 text-sm">← Back</button>
+        `;
+        dropdown.appendChild(btnContainer);
+
+        document.getElementById("backToFilters").addEventListener("click", (e) => {
+            e.stopPropagation();
+            loadFilters();
+        });
+    }
+
+    // Price options after cuisine filtered
+    async function showPriceOptionsForCuisine(selectedCuisines) {
+        dropdown.innerHTML = "";
+
+        const options = [
+            { label: "$ → $$$$", value: "asc" },
+            { label: "$$$$ → $", value: "desc" },
+            { label: "Skip", value: "none" },
+        ];
+
+        options.forEach(option => {
+            const li = document.createElement("li");
+            li.className = "px-4 py-2 hover:bg-gray-100 cursor-pointer";
+            li.textContent = option.label;
+
+            li.addEventListener("click", (e) => {
+                e.stopPropagation();
+
+                const keyword = selectedCuisines.join(", ");
+
+                if (option.value === "none") {
+                    // Just show cuisines without sorting
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                            pos => findNearbyRestaurants({ lat: pos.coords.latitude, lng: pos.coords.longitude }, keyword),
+                            () => findNearbyRestaurants({ lat: 49.282868, lng: -123.125032 }, keyword)
+                        );
+                    } else {
+                        findNearbyRestaurants({ lat: 49.282868, lng: -123.125032 }, keyword);
+                    }
+                    closeDropdown();
+                } else {
+                    // Cuisine + Price combined
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                            pos => findAndSortByCuisineAndPrice({ lat: pos.coords.latitude, lng: pos.coords.longitude }, keyword, option.value),
+                            () => findAndSortByCuisineAndPrice({ lat: 49.282868, lng: -123.125032 }, keyword, option.value)
+                        );
+                    } else {
+                        findAndSortByCuisineAndPrice({ lat: 49.282868, lng: -123.125032 }, keyword, option.value);
+                    }
+                    closeDropdown();
+                }
+            });
+
+            dropdown.appendChild(li);
+        });
+
+        // Back button
+        const btnContainer = document.createElement("div");
+        btnContainer.className = "flex justify-start px-4 py-2 border-t mt-2";
+        btnContainer.innerHTML = `
+            <button id="backToCuisine" class="text-gray-500 hover:text-gray-700 text-sm">← Back</button>
+        `;
+        dropdown.appendChild(btnContainer);
+
+        document.getElementById("backToCuisine").addEventListener("click", (e) => {
+            e.stopPropagation();
+            showCuisineOptions();
+        });
+    }
+
+
+    // Sort filters by price
+    async function sortByPrice(order = "desc") {
+        dropdown.classList.add("hidden");
+
+        const container = document.getElementById("resultsContainer");
+        container.innerHTML = "<p class='text-gray-500 px-4'>Sorting by price...</p>";
+
+        if (window.lastSearchResults.length > 0) {
+            sortExistingResultsByPrice(order);
+        } else {
+            // fallback if no search results yet
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    pos => findAndSortByPrice({ lat: pos.coords.latitude, lng: pos.coords.longitude }, order),
+                    () => findAndSortByPrice({ lat: 49.282868, lng: -123.125032 }, order)
+                );
+            } else {
+                findAndSortByPrice({ lat: 49.282868, lng: -123.125032 }, order);
+            }
+        }
+
+
+        closeDropdown();
+    }
+
+    // Helper function
+    async function findAndSortByPrice(location, order = "desc") {
+        const latLng = new google.maps.LatLng(location.lat, location.lng);
+        const service = new google.maps.places.PlacesService(map);
+
+        const request = {
+            query: "restaurant",
+            location: latLng,
+            radius: 1500,
+        };
+
+        service.textSearch(request, (results, status) => {
+            const container = document.getElementById("resultsContainer");
+            container.innerHTML = "";
+            clearMarkers();
+
+            if (status !== google.maps.places.PlacesServiceStatus.OK || !results?.length) {
+                container.innerHTML = `<p class="text-gray-600">No restaurants found.</p>`;
+                return;
+            }
+
+            // Sort by price ascending or descending
+            results.sort((a, b) => {
+                const priceA = a.price_level || 0;
+                const priceB = b.price_level || 0;
+                return order === "asc" ? priceA - priceB : priceB - priceA;
+            });
+
+            results.forEach((place) => {
+                // Add map markers
+                if (place.geometry?.location) {
+                    const marker = new google.maps.Marker({
+                        map,
+                        position: place.geometry.location,
+                        title: place.name,
+                    });
+                    markers.push(marker);
+                }
+
+                // Convert numeric price level → $, $$, $$$, $$$$
+                const priceSigns = place.price_level ? "$".repeat(place.price_level) : "N/A";
+
+                // Restaurant card
+                const card = document.createElement("div");
+                card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold">${place.name}</h3>
+                    </div>
+                    <p>${place.formatted_address || "No address available"}</p>
+                    <p class="text-yellow-600"> ${place.rating || "N/A"}</p>
+                    <p class="text-gray-700"> ${priceSigns || "N/A"}</p>
+                `;
+
+                // Add “Add to Craves” button
+                const addButton = document.createElement("button");
+                addButton.textContent = "+";
+                addButton.className = "ml-2 bg-orange-300 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
+                addButton.addEventListener("click", async () => {
+                    await addToCrave(addButton, {
+                        name: place.name,
+                        formattedAddress: place.formatted_address,
+                        rating: place.rating,
+                    });
+                    addButton.textContent = "✓ Added";
+                    addButton.disabled = true;
+                    addButton.classList.add("opacity-70");
+                });
+
+                const headerDiv = card.querySelector("div");
+                headerDiv.appendChild(addButton);
+
+                container.appendChild(card);
+            });
+        });
+    }
+        // Cuisine and Price combined
+    async function findAndSortByCuisineAndPrice(location, keyword, order = "desc") {
+        const latLng = new google.maps.LatLng(location.lat, location.lng);
+        const service = new google.maps.places.PlacesService(map);
+
+        const request = {
+            query: `${keyword} restaurant`,
+            location: latLng,
+            radius: 1500,
+        };
+
+        service.textSearch(request, (results, status) => {
+            const container = document.getElementById("resultsContainer");
+            container.innerHTML = "";
+            clearMarkers();
+
+            if (status !== google.maps.places.PlacesServiceStatus.OK || !results?.length) {
+                container.innerHTML = `<p class="text-gray-600">No restaurants found.</p>`;
+                return;
+            }
+
+            // Sort by price order
+            results.sort((a, b) => {
+                const priceA = a.price_level || 0;
+                const priceB = b.price_level || 0;
+                return order === "asc" ? priceA - priceB : priceB - priceA;
+            });
+
+            results.forEach((place) => {
+                if (place.geometry?.location) {
+                    const marker = new google.maps.Marker({
+                        map,
+                        position: place.geometry.location,
+                        title: place.name,
+                    });
+                    markers.push(marker);
+                }
+
+                const priceSigns = place.price_level ? "$".repeat(place.price_level) : "N/A";
+
+                const card = document.createElement("div");
+                card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold">${place.name}</h3>
+                    </div>
+                    <p>${place.formatted_address || "No address available"}</p>
+                    <p class="text-yellow-600"> ${place.rating || "N/A"}</p>
+                    <p class="text-gray-700"> ${priceSigns|| "N/A"}</p>
+                `;
+
+                const addButton = document.createElement("button");
+                addButton.textContent = "+";
+                addButton.className = "ml-2 bg-orange-300 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
+                addButton.addEventListener("click", async () => {
+                    await addToCrave(addButton, {
+                        name: place.name,
+                        formattedAddress: place.formatted_address,
+                        rating: place.rating,
+                    });
+                    addButton.textContent = "✓ Added";
+                    addButton.disabled = true;
+                    addButton.classList.add("opacity-70");
+                });
+
+                const headerDiv = card.querySelector("div");
+                headerDiv.appendChild(addButton);
+                container.appendChild(card);
+            });
+        });
+        showFilterSummary({ cuisines: keyword.split(", "), price: order });
+
+    }
+
+        // Sort existing search results by price
+    function sortExistingResultsByPrice(order = "desc") {
+        const container = document.getElementById("resultsContainer");
+        container.innerHTML = "";
+        clearMarkers();
+
+        const sorted = [...window.lastSearchResults].sort((a, b) => {
+            const priceA = a.price_level || 0;
+            const priceB = b.price_level || 0;
+            return order === "asc" ? priceA - priceB : priceB - priceA;
+        });
+
+        sorted.forEach((place) => {
+            if (place.geometry?.location) {
+                const marker = new google.maps.Marker({
+                    map,
+                    position: place.geometry.location,
+                    title: place.name,
+                });
+                markers.push(marker);
+            }
+
+            const priceSigns = place.price_level ? "$".repeat(place.price_level) : "N/A";
+            const card = document.createElement("div");
+            card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold">${place.name}</h3>
+                </div>
+                <p>${place.formatted_address || "No address available"}</p>
+                <p class="text-yellow-600"> ${place.rating || "N/A"}</p>
+                <p class="text-gray-700"> ${priceSigns|| "N/A"}</p>
+            `;
+
+            const addButton = document.createElement("button");
+            addButton.textContent = "+";
+            addButton.className = "ml-2 bg-orange-300 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
+            addButton.addEventListener("click", async () => {
+                await addToCrave(addButton, {
+                    name: place.name,
+                    formattedAddress: place.formatted_address,
+                    rating: place.rating,
+                });
+                addButton.textContent = "✓ Added";
+                addButton.disabled = true;
+                addButton.classList.add("opacity-70");
+            });
+
+            const headerDiv = card.querySelector("div");
+            headerDiv.appendChild(addButton);
+            container.appendChild(card);
+        });
+        showFilterSummary({ price: order });
+    }
+
+    // Filter existing results by cusiine
+    function filterExistingResultsByCuisine(selectedCuisines) {
+        const container = document.getElementById("resultsContainer");
+        container.innerHTML = "";
+        clearMarkers();
+
+        const filtered = window.lastSearchResults.filter((place) => {
+            const name = place.name?.toLowerCase() || "";
+            return selectedCuisines.some(cuisine => name.includes(cuisine.toLowerCase()));
+        });
+
+        if (filtered.length === 0) {
+            container.innerHTML = `<p class="text-gray-600 px-4">No restaurants match your selected cuisines.</p>`;
+            return;
+        }
+
+        filtered.forEach((place) => {
+            if (place.geometry?.location) {
+                const marker = new google.maps.Marker({
+                    map,
+                    position: place.geometry.location,
+                    title: place.name,
+                });
+                markers.push(marker);
+            }
+
+            const priceSigns = place.price_level ? "$".repeat(place.price_level) : "N/A";
+            const card = document.createElement("div");
+            card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold">${place.name}</h3>
+                </div>
+                <p>${place.formatted_address || "No address available"}</p>
+                <p class="text-yellow-600">⭐ ${place.rating || "N/A"}</p>
+                <p class="text-gray-700">💲 ${priceSigns}</p>
+            `;
+
+            const addButton = document.createElement("button");
+            addButton.textContent = "+";
+            addButton.className = "ml-2 bg-orange-300 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
+            addButton.addEventListener("click", async () => {
+                await addToCrave(addButton, {
+                    name: place.name,
+                    formattedAddress: place.formatted_address,
+                    rating: place.rating,
+                });
+                addButton.textContent = "✓ Added";
+                addButton.disabled = true;
+                addButton.classList.add("opacity-70");
+            });
+
+            const headerDiv = card.querySelector("div");
+            headerDiv.appendChild(addButton);
+            container.appendChild(card);
+        });
+
+        // Update memory so you can sort by price next
+        window.lastSearchResults = filtered;
+        showFilterSummary({ cuisines: selectedCuisines });
+
+    }
+
+        // Filter summary
+    function showFilterSummary({ cuisines = [], price = "" }) {
+        const summary = document.getElementById("filterSummary");
+        const text = document.getElementById("filterSummaryText");
+
+        let summaryText = "";
+        if (cuisines.length > 0) summaryText += `🍴 Cuisine: ${cuisines.join(", ")}`;
+        if (price) {
+            if (summaryText) summaryText += " | ";
+            summaryText += price === "asc" ? "$ → $$$$" : "$$$$ → $";
+        }
+
+        text.textContent = summaryText || "";
+        summary.classList.remove("hidden");
+
+        document.getElementById("clearFiltersBtn").onclick = () => {
+            clearFilters();
+        };
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+    }
+
+    function clearFilters() {
+        const summary = document.getElementById("filterSummary");
+        summary.classList.add("hidden");
+
+        if (window.originalSearchResults.length === 0) return;
+
+        window.lastSearchResults = [...window.originalSearchResults];
+
+        const container = document.getElementById("resultsContainer");
+        container.innerHTML = "";
+        clearMarkers();
+
+        window.lastSearchResults.forEach((place) => {
+            if (place.geometry?.location) {
+                const marker = new google.maps.Marker({
+                    map,
+                    position: place.geometry.location,
+                    title: place.name,
+                });
+                markers.push(marker);
+            }
+
+            const priceSigns = place.price_level ? "$".repeat(place.price_level) : "N/A";
+            const card = document.createElement("div");
+            card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold">${place.name}</h3>
+                </div>
+                <p>${place.formatted_address || "No address available"}</p>
+                <p class="text-yellow-600">⭐ ${place.rating || "N/A"}</p>
+                <p class="text-gray-700">💲 ${priceSigns}</p>
+            `;
+
+            const addButton = document.createElement("button");
+            addButton.textContent = "+";
+            addButton.className = "ml-2 bg-orange-300 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
+            addButton.addEventListener("click", async () => {
+                await addToCrave(addButton, {
+                    name: place.name,
+                    formattedAddress: place.formatted_address,
+                    rating: place.rating,
+                });
+                addButton.textContent = "✓ Added";
+                addButton.disabled = true;
+                addButton.classList.add("opacity-70");
+            });
+
+            const headerDiv = card.querySelector("div");
+            headerDiv.appendChild(addButton);
+            container.appendChild(card);
+        });
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+
+
+
+    loadFilters();
+});
+
+
 
