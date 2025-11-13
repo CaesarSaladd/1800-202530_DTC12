@@ -1,12 +1,11 @@
-import { auth } from "./firebaseConfig.js";
-import { db } from "./firebaseConfig.js";
+import { db, auth } from "./firebaseConfig.js";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 
 
 async function populateCrave() {
     auth.onAuthStateChanged(async (user) => {
         const craveCardTemplate = document.getElementById("craves");
-        const craveCardContainer = document.getElementById("profCraves");
+        const craveCardContainer = document.getElementById("profCraves");  // The container where craves will be appended
         let userId;
 
         if (user) {
@@ -23,7 +22,7 @@ async function populateCrave() {
             querySnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
                 let restaurantName = data.name;
-                let restaurantRating = data.rating || "N/A";
+                let restaurantRating = data.rating || "N/A";  // Default to "N/A" if no rating
                 let restaurantAddress = data.address || "N/A";
 
                 // Clone the template content
