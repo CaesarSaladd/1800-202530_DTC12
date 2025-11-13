@@ -21,15 +21,17 @@
 
 <body class="mx-auto max-w-screen-lg my-2">
     <!-- Call to Action -->
-
     <div class="menu flex flex-row justify-between overflow-visible relative z-[9999]">
         <img src="./images/binge_invis.png" width="100" class="object-contain pl-3">
         <div class="relative">
-            <button onclick="myDropdown()" class="flex hover:bg-gray-400 rounded-lg place-content-end z-[9999] relative"><img src="burger.svg" id="burger-menu"></button>
-            <ul id="myDropdown" class="hidden absolute right-0 mt-2 bg-white shadow-lg rounded-lg w-40 z-[10000]">
-                <li class="pr-4 py-2">Cuisine</li>
-                <li class="pr-4 py-2">Reviews</li>
-                <li class="pr-4 py-2">Price</li>
+            <button class="flex hover:bg-gray-400 rounded-lg place-content-end z-[9999] relative">
+                <img src="burger.svg" id="burger-menu">
+            </button>
+            <ul id="myDropdown" class="hidden absolute right-0 mt-2 bg-white shadow-lg rounded-lg w-40 z-[10000]
+             transition-all duration-200 ease-in-out origin-top scale-95 opacity-0">
+                <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Cuisine</li>
+                <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Reviews</li>
+                <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Price</li>
             </ul>
         </div>
     </div>
@@ -48,6 +50,11 @@
             <div class="bg-gray-300 w-full max-w-sm flex flex-col justify-start rounded-3xl my-3 pt-2 pb-4">
                 <div id="filterTitle" class="flex flex-row mr-auto ml-6 my-2 bg-white px-2 py-2 rounded-2xl font-bold">
                     Suggested For You
+                </div>
+                
+                <div id="filterSummary" class="hidden bg-orange-100 text-gray-700 px-4 py-2 rounded-lg shadow mb-3 mx-2 flex justify-between items-center">
+                    <span id="filterSummaryText" class="text-sm"></span>
+                    <button id="clearFiltersBtn" class="text-sm text-red-500 hover:text-red-700 font-semibold">✕ Clear</button>
                 </div>
 
                 <div id="resultsContainer" class="flex flex-col items-center gap-3 px-2 py-2">

@@ -17,7 +17,9 @@
         <div class="menu flex flex-row justify-between overflow-visible relative z-[9999]">
             <img src="./images/binge_invis.png" width="100" class="object-contain pl-3">
             <div class="relative">
-                <button onclick="myDropdown()" class="flex hover:bg-gray-400 rounded-lg place-content-end z-[9999] relative"><img src="burger.svg" id="burger-menu"></button>
+                <button onclick="myDropdown()"
+                    class="flex hover:bg-gray-400 rounded-lg place-content-end z-[9999] relative"><img src="burger.svg"
+                        id="burger-menu"></button>
                 <ul id="myDropdown" class="hidden absolute right-0 mt-2 bg-white shadow-lg rounded-lg w-40 z-[10000]">
                     <li class="pr-4 py-2">Cuisine</li>
                     <li class="pr-4 py-2">Reviews</li>
@@ -27,16 +29,7 @@
         </div>
     </header>
     <main class="flex flex-col items-center justify-center min-h-screen bg-orange-300 font-[Nunito_Sans]">
-        <div id="stack" class="relative w-[300px] h-[400px]">
-            <div class="card absolute w-full h-full bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl font-semibold text-gray-700">
-            Cactus Club Cafe
-            </div>
-            <div class="card absolute w-full h-full bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl font-semibold text-gray-700">
-            Miku Sushi
-            </div>
-            <div class="card absolute w-full h-full bg-white rounded-2xl shadow-xl flex items-center justify-center text-2xl font-semibold text-gray-700">
-            The Keg Steakhouse
-            </div>
+        <div id="card-container" class="relative w-[300px] h-[400px]">
         </div>
         <p id="status" class="mt-8 text-xl text-gray-800 font-semibold"></p>
     </main>

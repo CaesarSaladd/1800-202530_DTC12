@@ -37,50 +37,75 @@
     </header>
     
     <main class="flex flex-col justify-center items-center overflow-y-auto">
-        <section id="profReviews" class="flex flex-col max-w-full">
-            <h1 class="mb-3 ml-2 text-3xl font-bold tracking-tight"> Reviews </h1>
-            <div class="flex space-x-3 flex-nowrap overflow-x-auto">
-                <a href="#" class="max-w-96 p-6  border-2 border-faded border-gray-600 rounded-lg">
-                    <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900"> Restaurant
-                        Name
-                    </h5>
-                    <p class="font-normal text-gray-700"> Lorem ipsum dolor sit amet consectetur
-                        adipisicing elit. Laudantium harum in, eveniet dolorem quaerat sint deserunt vero omnis
-                        doloribus
-                        commodi!</p>
-                </a>
-                <a href="#" class="max-w-96 max p-6  border-2 border-faded border-gray-600 rounded-lg">
-                    <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900"> Restaurant
-                        Name
-                    </h5>
-                    <p class="font-normal text-gray-700"> Lorem ipsum dolor sit amet consectetur
-                        adipisicing elit. Laudantium harum in, eveniet dolorem quaerat sint deserunt vero omnis
-                        doloribus
-                        commodi!</p>
-                </a>
-                <a href="#" class="max-w-96 max p-6  border-2 border-faded border-gray-600 rounded-lg">
-                    <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900"> Restaurant
-                        Name
-                    </h5>
-                    <p class="font-normal text-gray-700"> Lorem ipsum dolor sit amet consectetur
-                        adipisicing elit. Laudantium harum in, eveniet dolorem quaerat sint deserunt vero omnis
-                        doloribus
-                        commodi!</p>
-                </a>
-            </div>
-
+        <div class="w-full">
+            <h1 class="flex justify-center my-5 ml-2 text-3xl font-bold tracking-tight"> Reviews </h1>
+        </div>
+        <section id="profReviews" class="flex gap-x-3 mb-4 max-w-full overflow-x-auto">
+            <template id="reviews" class="flex space-x-8 flex-nowrap">
+                <div class="w-80 h-96 flex-shrink-0 p-6 border-2 border-faded border-gray-600 rounded-lg bg-orange-300">
+                    <div class="flex justify-between gap-x-4">
+                        <h5 class="reviewName mb-2 text-2xl font-semibold tracking-tight text-gray-900"></h5>
+                        <div class="relative inline-block text-left">
+                            <button type="button"
+                                class="dropdownBtn inline-flex justify-center w-full rounded-md text-gray-700 hover:bg-gray-300"
+                                id="menu-button">
+                                ⋮
+                            </button>
+                            <!-- Dropdown menu -->
+                            <div
+                                class="dropdownMenu hidden origin-top-right absolute right-0 mt-2 w-40 rounded-md bg-white">
+                                <div class="py-1">
+                                    <button
+                                        class="delButton w-full text-center px-4 py-2 text-sm text-red-600 hover:bg-red-300">
+                                        Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p
+                        class="reviewRating flex justify-center tracking-wider mt-auto font-bold text-gray-700 border-2 rounded-full border-gray-600">
+                    </p>
+                    <p class="reviewAddress text-gray-700"></p>
+                    <p class="text-gray-700 font-semibold mt-3"> Description: </p>
+                    <p
+                        class="reviewDescription mt-2 border-2 rounded-xl border-gray-700 p-2 text-gray-700 break-words overflow-y-auto h-32">
+                    </p>
+                </div>
+            </template>
         </section>
 
+
         <div class="w-full">
-            <h1 class="flex justify-start my-5 ml-2 text-3xl font-bold tracking-tight"> Craves </h1>
+            <h1 class="flex justify-center my-5 ml-2 text-3xl font-bold tracking-tight"> Craves </h1>
         </div>
         <section id="profCraves" class="flex gap-x-3 mb-4 max-w-full overflow-x-auto">
             <template id="craves" class="flex space-x-8 flex-nowrap">
-                <div class="w-80 flex-shrink-0 p-6 border-2 border-faded border-gray-600 rounded-lg bg-orange-300">
-                    <div class="flex justify-between">
-                        <h5 class="craveName mb-2 text-2xl font-semibold tracking-tight text-gray-900"></h5>
-                        <button class="delButton flex align-top text-red-500"> Remove </button>
+                <div
+                    class="w-80 flex-shrink-0 p-6 border-2 border-faded border-gray-600 rounded-lg bg-orange-300 relative">
+                    <div class="flex justify-between gap-x-4">
+                        <h5 class="craveName mb-2 mr-2 text-2xl font-semibold tracking-tight text-gray-900"></h5>
+
+                        <div class="relative inline-block text-left">
+                            <button type="button"
+                                class="dropdownBtn inline-flex justify-center w-full rounded-md text-gray-700 hover:bg-gray-300"
+                                id="menu-button">
+                                ⋮
+                            </button>
+                            <!-- Dropdown menu -->
+                            <div
+                                class="dropdownMenu hidden origin-top-right absolute right-0 mt-2 w-40 rounded-md bg-white">
+                                <div class="py-1">
+                                    <button
+                                        class="writeReviewBtn w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-300">
+                                        Write a Review</button>
+                                    <button
+                                        class="delButton w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-300">
+                                        Remove</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
                     <p
                         class="craveReview flex justify-center tracking-wider mt-auto font-bold text-gray-700 border-2 rounded-full border-gray-600">
                     </p>
@@ -88,6 +113,7 @@
                 </div>
             </template>
         </section>
+
 
 
         <section id="profLeftovers" class="flex flex-col max-w-full">
@@ -121,12 +147,9 @@
                         commodi!</p>
                 </a>
             </div>
-
-            <site-footer></site-footer>
-            
-        </section>
+        </section>    
     </main>
-
+    <site-footer></site-footer>
 
 
     <script type="module" src="./src/profile.js"></script>

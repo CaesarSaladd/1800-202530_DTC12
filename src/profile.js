@@ -27,14 +27,31 @@ async function populateCrave() {
 
                 // Clone the template content
                 const craveCard = craveCardTemplate.content.cloneNode(true);
+                const wholeCard = craveCard.querySelector("div.w-80");
 
                 // Update the cloned content with the data from Firestore
                 craveCard.querySelector(".craveName").textContent = restaurantName;  // Update the restaurant name
                 craveCard.querySelector(".craveReview").textContent = restaurantRating;  // Update the restaurant rating
-                craveCard.querySelector(".craveAddress").textContent = restaurantAddress;
+                craveCard.querySelector(".craveAddress").textContent = restaurantAddress; // Update restaurant address
+                let deleteButton = craveCard.querySelector(".delButton")
+                let reviewButton = craveCard.querySelector(".reviewButton")
 
-                // Append the cloned card to the container
-                craveCardContainer.appendChild(craveCard);
+                // Delete button, remove from database
+                deleteButton.addEventListener("click", async () => {
+                    try {
+                        await deleteDoc(doc(db, "users", userId, "craves", docSnap.id))
+                        wholeCard.remove();
+                    } catch (err) {
+                        console.log(err)
+                    }
+
+                })
+                craveCard.querySelector(".writeReviewBtn").addEventListener("click", () => {
+                    localStorage.setItem('restaurantDocID', docSnap.id);
+                    window.location.href = 'review.html';
+                });
+                // Append the to the container
+                craveCardContainer.appendChild(wholeCard);
             });
         } catch (error) {
             console.error("Error loading craves:", error);
@@ -42,4 +59,61 @@ async function populateCrave() {
     });
 }
 
+async function populateReview() {
+    auth.onAuthStateChanged(async (user) => {
+        if (!user) return;
+
+        const reviewCardTemplate = document.getElementById("reviews");
+        const reviewCardContainer = document.getElementById("profReviews");
+        const userId = user.uid;
+
+        try {
+            const revRef = collection(db, "users", userId, "reviews");
+            const querySnapshot = await getDocs(revRef);
+
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+
+                const restaurantName = data.restaurantName;
+                const restaurantRating = data.rating || "N/A";
+                const restaurantAddress = data.restaurantAddress || "N/A";
+                const restaurantDescription = data.description || "";
+
+                const reviewCard = reviewCardTemplate.content.cloneNode(true);
+                const wholeCard = reviewCard.querySelector("div.w-80");
+
+                reviewCard.querySelector(".reviewName").textContent = restaurantName;
+                reviewCard.querySelector(".reviewRating").textContent = restaurantRating;
+                reviewCard.querySelector(".reviewAddress").textContent = restaurantAddress;
+                reviewCard.querySelector(".reviewDescription").textContent = restaurantDescription;
+
+                const deleteButton = reviewCard.querySelector(".delButton");
+                deleteButton.addEventListener("click", async () => {
+                    try {
+                        await deleteDoc(doc(db, "users", userId, "reviews", docSnap.id));
+                        wholeCard.remove();
+                    } catch (err) {
+                        console.log(err);
+                    }
+                });
+
+                reviewCardContainer.appendChild(wholeCard);
+            });
+
+        } catch (error) {
+            console.error("Error loading reviews:", error);
+        }
+    });
+}
+
+document.addEventListener("click", (event) => {
+    // If a dropdown button was clicked, toggle that dropdown
+    const button = event.target.closest(".dropdownBtn");
+    if (button) {
+        const dropdown = button.nextElementSibling;
+        dropdown.classList.toggle("hidden");
+    }
+});
+
 populateCrave();
+populateReview();
