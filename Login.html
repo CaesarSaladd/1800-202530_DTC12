@@ -12,13 +12,13 @@
     <script type="module" src="src/login.js"></script>
 </head>
 
-<body class="binge-font">
+<body class="binge-font bg-[#FFF6E9]">
 
     <div id="loginView" class="loginBox">
         <div class="loginlogo">
             <img src="images/binge_invis.png" alt="Binge Logo">
         </div>
-        <p class="text-4xl" style="margin-bottom: 10px;">LOGIN:</p>
+        <p class="text-4xl binge-font " style="margin-bottom: 10px;">LOGIN:</p>
         <div id="authAlert" class="alert alert-danger d-none" role="alert"></div>
 
         <form id="loginForm">
@@ -34,12 +34,13 @@
             </br>
             </br>
 
-            <button type="submit" class="loginButton btn-primary btn-lg px-4 gap-3 binge-font">Login</button>
+            <button type="submit"
+                class="loginButton bg-orange-600 rounded-xl py-2 px-4 gap-3 text-white binge-font">Login</button>
         </form>
 
         <small class="d-block mt-3 text-center">
             Don't have an account?
-            <a href="#" id="toSignup">Sign up</a>
+            <a href="#" id="toSignup" class="no-underline text-orange-600">Sign up</a>
         </small>
     </div>
 
@@ -69,12 +70,13 @@
             <input type="password" id="signupConfirmPassword" class="loginput" name="confirmPassword" required>
             <br><br>
 
-            <button type="submit" class="loginButton btn-primary btn-lg px-4 gap-3 binge-font">Sign Up!</button>
+            <button type="submit"
+                class="loginButton bg-orange-600 rounded-xl py-2 px-4 gap-3 text-white binge-font">Sign Up!</button>
         </form>
 
         <small class="d-block mt-3 text-center">
             Already have an account?
-            <a href="#" id="toLogin">Login</a>
+            <a href="#" id="toLogin" class="no-underline text-orange-600">Login</a>
         </small>
     </div>
 

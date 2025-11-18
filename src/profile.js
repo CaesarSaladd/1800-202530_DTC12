@@ -31,10 +31,10 @@ async function populateCrave() {
 
                 // Update the cloned content with the data from Firestore
                 craveCard.querySelector(".craveName").textContent = restaurantName;  // Update the restaurant name
-                craveCard.querySelector(".craveReview").textContent = restaurantRating;  // Update the restaurant rating
+                craveCard.querySelector(".craveReview").textContent = restaurantRating + "★";  // Update the restaurant rating
                 craveCard.querySelector(".craveAddress").textContent = restaurantAddress; // Update restaurant address
                 let deleteButton = craveCard.querySelector(".delButton")
-                let reviewButton = craveCard.querySelector(".reviewButton")
+
 
                 // Delete button, remove from database
                 deleteButton.addEventListener("click", async () => {
@@ -83,7 +83,7 @@ async function populateReview() {
                 const wholeCard = reviewCard.querySelector("div.w-80");
 
                 reviewCard.querySelector(".reviewName").textContent = restaurantName;
-                reviewCard.querySelector(".reviewRating").textContent = restaurantRating;
+                reviewCard.querySelector(".reviewRating").textContent = restaurantRating + "★";
                 reviewCard.querySelector(".reviewAddress").textContent = restaurantAddress;
                 reviewCard.querySelector(".reviewDescription").textContent = restaurantDescription;
 
