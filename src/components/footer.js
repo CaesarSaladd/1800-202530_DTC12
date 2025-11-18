@@ -6,7 +6,7 @@ class SiteFooter extends HTMLElement {
             <a href="profile.html">
                 <div id="ProfileIcon"
                     class="hover:bg-gray-400 ficons px-2 md:px-4 mx-3  rounded-lg flex flex-col items-center justify-center">
-                    <svg class = "w-16 h-16 p-1"
+                    <svg class = "w-14 h-14 p-1"
                     xmlns="http://www.w3.org/2000/svg"
                     width="40"
                     height="40"
@@ -26,7 +26,7 @@ class SiteFooter extends HTMLElement {
             </a>
             <a href="swipe.html">
                 <div class="ficons  flex flex-col items-center justify-center px-2 md:px-4 mx-3 hover:bg-gray-400 rounded-lg">
-                    <svg class = "h-16 w-16 p-1"
+                    <svg class = "h-14 w-14 p-1"
                     xmlns="http://www.w3.org/2000/svg"
                     width="40"
                     height="40"
@@ -48,7 +48,7 @@ class SiteFooter extends HTMLElement {
                     <div
                         class="flex flex-col items-center justify-center hover:bg-gray-400 ficons px-2 md:px-4 mx-3  rounded-lg">
 
-                        <svg class = "h-16 w-16 p-1"
+                        <svg class = "h-14 w-14 p-1"
                         xmlns="http://www.w3.org/2000/svg"
                         width="40"
                         height="40"
