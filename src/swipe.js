@@ -22,48 +22,50 @@ async function waitForGoogleMaps() {
     });
 }
 
-// Load restaurants
 async function loadNearbyRestaurants() {
-    const defaultLocation = { lat: 49.282868, lng: -123.125032 };
+    const downtownCenter = { lat: 49.2835, lng: -123.1187 };
     const apiKey = "AIzaSyDKJe5Ga1Zc1anQ8ivg617LvGaChAy8aE4";
 
     const response = await fetch(
-        `https://places.googleapis.com/v1/places:searchText?key=${apiKey}`,
+        `https://places.googleapis.com/v1/places:searchNearby?key=${apiKey}`,
         {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-Goog-FieldMask":
-                    "places.displayName,places.formattedAddress,places.priceLevel,places.rating,places.photos,places.types",
+                "X-Goog-FieldMask": [
+                    "places.id",
+                    "places.displayName",
+                    "places.formattedAddress",
+                    "places.location",
+                    "places.rating",
+                    "places.priceLevel",
+                    "places.types",
+                    "places.photos.name"
+                ].join(",")
             },
             body: JSON.stringify({
-                textQuery: "restaurants near Downtown Vancouver",
-                locationBias: {
+                includedPrimaryTypes: ["restaurant"],
+                maxResultCount: 20, // Google limit
+                locationRestriction: {
                     circle: {
                         center: {
-                            latitude: defaultLocation.lat,
-                            longitude: defaultLocation.lng,
+                            latitude: downtownCenter.lat,
+                            longitude: downtownCenter.lng
                         },
-                        radius: 2000.0,
-                    },
-                },
-                maxResultCount: 15,
-            }),
+                        radius: 1600
+                    }
+                }
+            })
         }
     );
 
     if (!response.ok) {
-        throw new Error(`Places API HTTP error: ${response.status}`);
+        const err = await response.text();
+        console.error("PLACES API ERROR:", err);
+        throw new Error(`Places API error: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log("Fetched Places data:", data);
-
-    if (!data.places || data.places.length === 0) {
-        throw new Error("No restaurants found.");
-    }
-
-    // Convert photo URIs to usable URLs
     return data.places.map((p) => {
         const photoRef = p.photos?.[0]?.name;
         const photoUrl = photoRef
@@ -71,6 +73,7 @@ async function loadNearbyRestaurants() {
             : "https://storage.googleapis.com/support-kms-prod/SNP_2752125_en_v0";
 
         return {
+            id: p.id,
             name: p.displayName?.text || "Unnamed Restaurant",
             formatted_address: p.formattedAddress || "No address available",
             rating: p.rating || "N/A",
@@ -80,6 +83,9 @@ async function loadNearbyRestaurants() {
         };
     });
 }
+
+
+
 
 
 
