@@ -1,3 +1,8 @@
+* {
+    box-sizing: border-box;
+}
+
+
 .menu {
     display: flex;
     justify-content: flex-end;
@@ -15,10 +20,9 @@
 }
 
 .footericons {
-    padding: 20px;
-    background-color: white;
-    width: fit-content;
-    border-radius: 15px;
+    padding: 5px;
+    width: 100%;
+    border-radius: 5px;
     display: flex;
     flex-direction: row;
     flex-grow: inherit;
@@ -75,14 +79,6 @@
 
 #inputfields {
     margin-bottom: 20px;
-}
-
-.loginButton {
-    background-color: blue;
-    color: white;
-    padding: 10px;
-    width: 100px;
-    border-radius: 10px;
 }
 
 .loginButton:hover {

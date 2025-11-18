@@ -7,14 +7,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="./styles/style.css">
     <script type="module" src="src/components/footer.js"></script>
-    
+
 
     <title>Swipe Page</title>
 </head>
 
-<body class="mx-auto max-w-screen-lg my-2">
+<body class="mx-auto max-w-screen-lg my-2 bg-[#FFF6E9]">
     <header>
-        <div class="menu flex flex-row justify-between overflow-visible relative z-[9999]">
+        <div class="menu flex flex-row justify-between overflow-visible relative z-[10000]">
             <img src="./images/binge_invis.png" width="100" class="object-contain pl-3">
             <div class="relative">
                 <button onclick="myDropdown()"
@@ -29,16 +29,16 @@
         </div>
     </header>
     <main class="flex flex-col items-center justify-center min-h-screen bg-orange-300 font-[Nunito_Sans]">
-        <div id="card-container" class="relative w-[300px] h-[400px]">
+        <div id="card-container" class="relative w-[400px] h-[600px] -translate-y-20">
         </div>
-        <p id="status" class="mt-8 text-xl text-gray-800 font-semibold"></p>
+        <p id="status" class="mt-8 text-xl text-gray-800 font-semibold -translate-y-20"></p>
     </main>
 
     <site-footer></site-footer>
 
     <script async src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
     <script type="module" src="./src/swipe.js"></script>
-    
+
 </body>
 
 </html>
