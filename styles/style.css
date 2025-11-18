@@ -82,14 +82,6 @@
     margin-bottom: 20px;
 }
 
-.loginButton {
-    background-color: blue;
-    color: white;
-    padding: 10px;
-    width: 100px;
-    border-radius: 10px;
-}
-
 .loginButton:hover {
     background-color: lightblue;
     color: black;

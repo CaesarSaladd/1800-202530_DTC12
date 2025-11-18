@@ -62,7 +62,7 @@ class SiteFooter extends HTMLElement {
                         <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
                         <path d="M21 21l-6 -6" />
                         </svg>
-                        <h3 class = "font-semibold"> Search </h3>
+                        <h3 class = "font-semibold no-underline"> Search </h3>
                     </div>
                 </a>
         </div>
