@@ -6,7 +6,7 @@ if (typeof global === "undefined") {
 
 import { Stack, Direction } from "swing";
 import { db, auth } from "./firebaseConfig.js";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp, getDocs } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
 // Load google maps
@@ -99,6 +99,32 @@ onAuthStateChanged(auth, async (user) => {
     try {
         restaurants = await loadNearbyRestaurants();
         console.log("Loaded restaurants:", restaurants.map(r => r.displayName || r.name));
+        // --- Load user's existing swipes (craves + leftovers) ---
+        const craveRef = collection(db, "users", user.uid, "craves");
+        const leftoverRef = collection(db, "users", user.uid, "leftovers");
+
+        const craveDocs = await getDocs(craveRef);
+        const leftoverDocs = await getDocs(leftoverRef);
+
+        // Combine restaurant names user already swiped
+        const previouslySwiped = new Set([
+            ...craveDocs.docs.map(d => d.data().name),
+            ...leftoverDocs.docs.map(d => d.data().name)
+        ]);
+
+        // Filter out previously swiped restaurants
+        restaurants = restaurants.filter(r => !previouslySwiped.has(r.name));
+
+        console.log("After filtering:", restaurants.map(r => r.name));
+        
+        // If no restaurants remain after filtering, show message and stop
+        if (restaurants.length === 0) {
+            document.getElementById("status").textContent =
+                "No more restaurants nearby!";
+            return;
+        }
+
+
     } catch (err) {
         console.error(err);
         document.getElementById("status").textContent = "Failed to load restaurants.";
@@ -142,64 +168,63 @@ onAuthStateChanged(auth, async (user) => {
     });
 
 
-    // Initialize Swing.js stack
+    // Initialize the Swing.js stack once
     const stack = Stack();
+    const cardElements = Array.from(document.querySelectorAll(".card"));
 
-    document.querySelectorAll(".card").forEach((card) => {
-        card.style.cursor = "grab";
-        stack.createCard(card);
+    // Bind cards to the stack immediately after creating them
+    cardElements.forEach((card) => {
+    card.style.cursor = "grab";
+    stack.createCard(card);
     });
 
+    // Handle swipe directions
+    stack.on("throwout", async (e) => {
+    const restaurantName = e.target.querySelector("h2").textContent;
+    const address = e.target.querySelector("p").textContent;
+    const ratingEl = e.target.querySelector("span");
+    const rating = ratingEl ? ratingEl.textContent.replace("⭐ ", "") : "N/A";
+
+    const isCrave = e.throwDirection === Direction.RIGHT;
+    const targetCollection = isCrave ? "craves" : "leftovers";
     const status = document.getElementById("status");
 
-    // Reset styles when card returns to center
-    stack.on("throwin", (e) => {
-        e.target.style.transform = "";
-        e.target.style.opacity = "";
-        status.textContent = "";
-    });
+    // Feedback text
+    status.textContent = isCrave
+        ? `You crave ${restaurantName}!`
+        : `You left ${restaurantName} as leftovers!`;
 
-    stack.on("throwout", async (e) => {
-        const restaurantName = e.target.querySelector("h2").textContent;
-        const address = e.target.querySelector("p").textContent;
-        const ratingElement = e.target.querySelector("span");
-        const rating = ratingElement ? ratingElement.textContent.replace("⭐ ", "") : "N/A";
+    const userRef = collection(db, "users", user.uid, targetCollection);
+    const existingDocs = await getDocs(userRef);
+    const alreadyExists = existingDocs.docs.some(
+        (doc) => doc.data().name === restaurantName
+    );
 
-        const isCrave = e.throwDirection === Direction.RIGHT;
-        const targetCollection = isCrave ? "craves" : "leftovers";
+    if (!alreadyExists) {
+        await addDoc(userRef, {
+        name: restaurantName,
+        address,
+        rating,
+        added_at: serverTimestamp(),
+        });
+        console.log(`${restaurantName} added to ${targetCollection}.`);
+    }
 
-        // Show feedback text
-        status.textContent = isCrave
-            ? `You crave ${restaurantName}!`
-            : `You left ${restaurantName} as leftovers!`;
-
-        // Check if restaurant already exists in that collection
-        const userRef = collection(db, "users", user.uid, targetCollection);
-        const existingDocs = await getDocs(userRef);
-        const alreadyExists = existingDocs.docs.some(
-            (doc) => doc.data().name === restaurantName
-        );
-
-        if (alreadyExists) {
-            console.log(`${restaurantName} is already in your ${targetCollection}.`);
-        } else {
-            await addDoc(userRef, {
-                name: restaurantName,
-                address,
-                rating,
-                added_at: serverTimestamp(),
-            });
-            console.log(`${restaurantName} added to ${targetCollection}.`);
-        }
-
-        // Remove the swiped card
+    // Remove card after animation ends
+    setTimeout(() => {
         e.target.remove();
-
-        // Show message when out of cards
-        if (cardContainer.children.length === 0) {
-            status.textContent = "No more restaurants nearby!";
+        if (!cardContainer.children.length) {
+        status.textContent = "No more restaurants nearby!";
         }
+    }, 300); 
     });
+    stack.on("throwin", (e) => {
+    e.target.style.transform = "";
+    e.target.style.opacity = "";
+    document.getElementById("status").textContent = "";
+    });
+
 
 
 });
+
