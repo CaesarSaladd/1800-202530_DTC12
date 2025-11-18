@@ -17,8 +17,8 @@
 .footericons {
     padding: 20px;
     background-color: white;
-    width: fit-content;
-    border-radius: 15px;
+    width: 100%;
+    border-radius: 5px;
     display: flex;
     flex-direction: row;
     flex-grow: inherit;
