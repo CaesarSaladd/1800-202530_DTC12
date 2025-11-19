@@ -3,9 +3,9 @@ class SiteFooter extends HTMLElement {
         this.innerHTML = `
     <footer>
         <div class="footericons bg-[#fbf4ed]">
-            <a href="profile.html">
+            <a class = "no-underline text-black transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110" href="profile.html">
                 <div id="ProfileIcon"
-                    class="hover:bg-gray-400 ficons px-2 md:px-4 mx-3  rounded-lg flex flex-col items-center justify-center">
+                    class="hover:bg-orange-200 ficons px-2 md:px-4 mx-3  rounded-lg flex flex-col items-center justify-center">
                     <svg class = "w-14 h-14 p-1"
                     xmlns="http://www.w3.org/2000/svg"
                     width="40"
@@ -24,8 +24,8 @@ class SiteFooter extends HTMLElement {
                     <h3 class = "font-semibold"> Profile </h3>
                 </div>
             </a>
-            <a href="swipe.html">
-                <div class="ficons  flex flex-col items-center justify-center px-2 md:px-4 mx-3 hover:bg-gray-400 rounded-lg">
+            <a class = "no-underline text-black transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110" href="swipe.html">
+                <div class="ficons  flex flex-col items-center justify-center px-2 md:px-4 mx-3 hover:bg-orange-200 rounded-lg">
                     <svg class = "h-14 w-14 p-1"
                     xmlns="http://www.w3.org/2000/svg"
                     width="40"
@@ -44,9 +44,9 @@ class SiteFooter extends HTMLElement {
                     <h3 class = "font-semibold"> Swipe </h3>
                 </div>
             </a>
-                <a href="search.html">
+                <a class = "no-underline text-black transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110" href="search.html">
                     <div
-                        class="flex flex-col items-center justify-center hover:bg-gray-400 ficons px-2 md:px-4 mx-3  rounded-lg">
+                        class="flex flex-col items-center justify-center hover:bg-orange-200 ficons px-2 md:px-4 mx-3  rounded-lg">
 
                         <svg class = "h-14 w-14 p-1"
                         xmlns="http://www.w3.org/2000/svg"
