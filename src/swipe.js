@@ -9,6 +9,18 @@ import { db, auth } from "./firebaseConfig.js";
 import { addDoc, collection, serverTimestamp, getDocs } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
+let angle = 0;
+
+function getRotatedCenter(baseLat, baseLng) {
+    const radius = 0.020; // 200m offset
+    angle += Math.PI / 6;   // rotate 30°
+    return {
+        lat: baseLat + radius * Math.cos(angle),
+        lng: baseLng + radius * Math.sin(angle)
+    };
+}
+
+
 // Load google maps
 async function waitForGoogleMaps() {
     return new Promise((resolve) => {
@@ -24,6 +36,7 @@ async function waitForGoogleMaps() {
 
 async function loadNearbyRestaurants() {
     const downtownCenter = { lat: 49.2835, lng: -123.1187 };
+    const rotatedCenter = getRotatedCenter(downtownCenter.lat, downtownCenter.lng);
     const apiKey = "AIzaSyDKJe5Ga1Zc1anQ8ivg617LvGaChAy8aE4";
 
     const response = await fetch(
@@ -49,8 +62,9 @@ async function loadNearbyRestaurants() {
                 locationRestriction: {
                     circle: {
                         center: {
-                            latitude: downtownCenter.lat,
-                            longitude: downtownCenter.lng
+                            latitude: rotatedCenter.lat,
+                            longitude: rotatedCenter.lng
+
                         },
                         radius: 1600
                     }
@@ -217,11 +231,69 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     // Remove card after animation ends
-    setTimeout(() => {
+    setTimeout(async() => {
         e.target.remove();
-        if (!cardContainer.children.length) {
-        status.textContent = "No more restaurants nearby!";
-        }
+            if (!cardContainer.children.length) {
+                status.textContent = "Loading more restaurants...";
+
+                // Load another rotated batch
+                let more = [];
+                try {
+                    more = await loadNearbyRestaurants();
+                    //  Filter out restaurants already swiped
+                    const craveRef2 = collection(db, "users", user.uid, "craves");
+                    const leftoverRef2 = collection(db, "users", user.uid, "leftovers");
+
+                    const craveDocs2 = await getDocs(craveRef2);
+                    const leftoverDocs2 = await getDocs(leftoverRef2);
+
+                    const previouslySwiped2 = new Set([
+                        ...craveDocs2.docs.map(d => d.data().name),
+                        ...leftoverDocs2.docs.map(d => d.data().name)
+                    ]);
+
+                    more = more.filter(r => !previouslySwiped2.has(r.name));
+                } catch (err) {
+                    console.error(err);
+                    status.textContent = "Failed to load more restaurants.";
+                    return;
+                }
+
+                if (more.length === 0) {
+                    status.textContent = "No more restaurants nearby!";
+                    return;
+                }
+
+                // Add new cards
+                more.forEach((place) => {
+                    const name = place.name || "Unnamed Restaurant";
+                    const rating = place.rating || "N/A";
+                    const priceSigns = place.price_level && !isNaN(place.price_level)
+                        ? "$".repeat(place.price_level)
+                        : "N/A";
+                    const address = place.formatted_address || "No address available";
+                    const photoUrl = place.photoUrl;
+
+                    const card = document.createElement("div");
+                    card.className = "card bg-white p-4 rounded-2xl shadow-lg absolute inset-0 flex flex-col justify-between text-center transition-all";
+
+                    card.innerHTML = `
+                        <div class="relative w-full h-full rounded-2xl overflow-hidden">
+                            <img src="${photoUrl}" alt="${name}" class="absolute inset-0 w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+                            <div class="absolute bottom-0 p-4 text-left text-white">
+                                <h2 class="text-xl font-bold drop-shadow-md mb-1">${name}</h2>
+                                <p class="text-sm opacity-90">${address}</p>
+                            </div>
+                        </div>
+                    `;
+
+                    cardContainer.appendChild(card);
+                    stack.createCard(card);
+                });
+
+                status.textContent = "";
+            }
     }, 300); 
     });
     stack.on("throwin", (e) => {
