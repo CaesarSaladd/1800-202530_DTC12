@@ -1,4 +1,4 @@
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, updateProfile } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "./firebaseConfig.js";
 
@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const userRef = doc(db, "users", user.uid);
             await updateDoc(userRef, { name });  // <-- write to "name"
+            await updateProfile(user, { displayName: name });
             console.log("Name successfully updated:", name);
 
             // Disable editing again

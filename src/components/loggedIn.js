@@ -11,6 +11,7 @@ const usernameDisplay = document.getElementById('usernameDisplay');
 onAuthStateChanged(auth, (user) => {
     if (user) {
         const username = user.displayName || user.email
+        console.log(username)
         usernameDisplay.textContent = username
     } else {
         console.log('no user logged in')
