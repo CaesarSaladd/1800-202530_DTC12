@@ -7,12 +7,15 @@ import {
 
 const auth = getAuth();
 const usernameDisplay = document.getElementById('usernameDisplay');
+const placeholderText = document.getElementById('nameInput');
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
         const username = user.displayName || user.email
-        console.log(username)
         usernameDisplay.textContent = username
+        if (placeholderText){
+            placeholderText.placeholder = username
+        }
     } else {
         console.log('no user logged in')
     }
