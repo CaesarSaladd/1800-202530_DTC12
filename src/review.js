@@ -120,4 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 👇👇👇 Add these two lines
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.addEventListener('click', writeReview);
+
+    const cancelBtn = document.getElementById('cancelBtn');
+    cancelBtn.addEventListener('click', () => {
+        window.location.href = "profile.html";
+    });
 });

@@ -18,6 +18,12 @@ onAuthStateChanged(auth, async (user) => {
     initMap(); // load map and restaurant data
 });
 
+// Reset function
+function resetToOriginal() {
+    window.lastSearchResults = [...window.originalSearchResults];
+}
+
+
 // --------- ADD TO CRAVES ----------
 async function addToCrave(parentElement, restaurantData) {
     const user = window.currentUser;
@@ -276,6 +282,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }
 
+            if (data.filter.toLowerCase() === "reviews") {
+                li.addEventListener("click", (event) => {
+                    event.stopPropagation();
+                    showReviewOptions();
+                });
+            }
+
             dropdown.appendChild(li);
         });
         } catch (err) {
@@ -290,17 +303,10 @@ document.addEventListener("DOMContentLoaded", () => {
         dropdown.innerHTML = "";
 
         const cuisines = [
-            "Italian",
-            "Japanese",
-            "Indian",
-            "Mexican",
-            "Chinese",
-            "Thai",
-            "Korean",
-            "Brazilian",
-            "Mediterranean",
-            "Soul Food",
-            "Fast Food"
+            "Sushi",
+            "Steak",
+            "Burger",
+            "Italian"
         ];
 
         cuisines.forEach((cuisine) => {
@@ -326,7 +332,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         document.getElementById("applyCuisine").addEventListener("click", (e) => {
+            e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation();
             const selected = [...document.querySelectorAll(".checkbox-cuisine:checked")].map((cb) => cb.value);
 
             if (selected.length === 0) {
@@ -337,7 +345,18 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Selected cuisines:", selected);
 
             if (window.lastSearchResults.length > 0) {
+                const filtered = window.lastSearchResults.filter(place => {
+                    const name = place.name?.toLowerCase() || "";
+                    return selected.some(cuisine =>
+                        name.includes(cuisine.toLowerCase())
+                    );
+                });
+
+
+                // Show filtered list in UI
+                window.lastSearchResults = filtered;
                 filterExistingResultsByCuisine(selected);
+
             } else {
                 // fallback: query Google if no prior search
                 const keyword = selected.join(", ");
@@ -391,6 +410,160 @@ document.addEventListener("DOMContentLoaded", () => {
             loadFilters();
         });
     }
+
+    async function showReviewOptions() {
+        dropdown.innerHTML = "";
+
+        const options = [
+            { label: "⭐ High → Low", value: "desc" },
+            { label: "⭐ Low → High", value: "asc" }
+        ];
+
+        options.forEach(option => {
+            const li = document.createElement("li");
+            li.className = "px-4 py-2 hover:bg-gray-100 cursor-pointer";
+            li.textContent = option.label;
+
+            li.addEventListener("click", (e) => {
+                e.stopPropagation();
+                sortByReviews(option.value);
+            });
+
+            dropdown.appendChild(li);
+        });
+
+        // Back button
+        const btnContainer = document.createElement("div");
+        btnContainer.className = "flex justify-start px-4 py-2 border-t mt-2";
+        btnContainer.innerHTML = `
+            <button id="backToFilters" class="text-gray-500 hover:text-gray-700 text-sm">← Back</button>
+        `;
+        dropdown.appendChild(btnContainer);
+
+        document.getElementById("backToFilters").addEventListener("click", (e) => {
+            e.stopPropagation();
+            loadFilters();
+        });
+    }
+
+    function sortByReviews(order = "desc") {
+        dropdown.classList.add("hidden");
+
+        const container = document.getElementById("resultsContainer");
+        container.innerHTML = "<p class='text-gray-500 px-4'>Sorting by reviews...</p>";
+
+        if (window.lastSearchResults.length > 0) {
+            sortExistingResultsByReviews(order);
+        } else {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    pos => findAndSortByReviews({ lat: pos.coords.latitude, lng: pos.coords.longitude }, order),
+                    () => findAndSortByReviews({ lat: 49.282868, lng: -123.125032 }, order)
+                );
+            } else {
+                findAndSortByReviews({ lat: 49.282868, lng: -123.125032 }, order);
+            }
+        }
+
+        closeDropdown();
+    }
+
+    function sortExistingResultsByReviews(order = "desc") {
+        const container = document.getElementById("resultsContainer");
+        container.innerHTML = "";
+        clearMarkers();
+
+        const sorted = [...window.lastSearchResults].sort((a, b) => {
+            const ratingA = a.rating || 0;
+            const ratingB = b.rating || 0;
+            return order === "asc" ? ratingA - ratingB : ratingB - ratingA;
+        });
+
+        renderResultCards(sorted);
+        showFilterSummary({ reviews: order });
+    }
+
+    function findAndSortByReviews(location, order = "desc") {
+        const latLng = new google.maps.LatLng(location.lat, location.lng);
+        const service = new google.maps.places.PlacesService(map);
+
+        const request = {
+            query: "restaurant",
+            location: latLng,
+            radius: 1500,
+        };
+
+        service.textSearch(request, (results, status) => {
+            const container = document.getElementById("resultsContainer");
+            container.innerHTML = "";
+            clearMarkers();
+
+            if (status !== google.maps.places.PlacesServiceStatus.OK || !results?.length) {
+                container.innerHTML = `<p class="text-gray-600">No restaurants found.</p>`;
+                return;
+            }
+
+            results.sort((a, b) => {
+                const ratingA = a.rating || 0;
+                const ratingB = b.rating || 0;
+                return order === "asc" ? ratingA - ratingB : ratingB - ratingA;
+            });
+
+            renderResultCards(results);
+        });
+    }
+
+    function renderResultCards(results) {
+        const container = document.getElementById("resultsContainer");
+        container.innerHTML = "";
+        clearMarkers();
+
+        results.forEach((place) => {
+            if (place.geometry?.location) {
+                const marker = new google.maps.Marker({
+                    map,
+                    position: place.geometry.location,
+                    title: place.name,
+                });
+                markers.push(marker);
+            }
+
+            const priceSigns = place.price_level ? "$".repeat(place.price_level) : "N/A";
+
+            const card = document.createElement("div");
+            card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold">${place.name}</h3>
+                </div>
+                <p>${place.formatted_address || "No address available"}</p>
+                <p class="text-yellow-600">⭐ ${place.rating || "N/A"}</p>
+                <p class="text-gray-700"> ${priceSigns}</p>
+            `;
+
+            const addButton = document.createElement("button");
+            addButton.textContent = "+";
+            addButton.className = "ml-2 bg-orange-300 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
+            addButton.addEventListener("click", async () => {
+                await addToCrave(addButton, {
+                    name: place.name,
+                    formattedAddress: place.formatted_address,
+                    rating: place.rating,
+                });
+                addButton.textContent = "✓ Added";
+                addButton.disabled = true;
+                addButton.classList.add("opacity-70");
+            });
+
+            const headerDiv = card.querySelector("div");
+            headerDiv.appendChild(addButton);
+            container.appendChild(card);
+        });
+    }
+
+
+
+
 
     // Price options after cuisine filtered
     async function showPriceOptionsForCuisine(selectedCuisines) {
@@ -558,6 +731,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
         // Cuisine and Price combined
     async function findAndSortByCuisineAndPrice(location, keyword, order = "desc") {
+        resetToOriginal();
         const latLng = new google.maps.LatLng(location.lat, location.lng);
         const service = new google.maps.places.PlacesService(map);
 
@@ -635,7 +809,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const container = document.getElementById("resultsContainer");
         container.innerHTML = "";
         clearMarkers();
-
+        resetToOriginal();
         const sorted = [...window.lastSearchResults].sort((a, b) => {
             const priceA = a.price_level || 0;
             const priceB = b.price_level || 0;
@@ -691,10 +865,13 @@ document.addEventListener("DOMContentLoaded", () => {
         container.innerHTML = "";
         clearMarkers();
 
-        const filtered = window.lastSearchResults.filter((place) => {
+        const filtered = window.lastSearchResults.filter(place => {
             const name = place.name?.toLowerCase() || "";
-            return selectedCuisines.some(cuisine => name.includes(cuisine.toLowerCase()));
+            return selectedCuisines.some(cuisine =>
+                name.includes(cuisine.toLowerCase())
+            );
         });
+
 
         if (filtered.length === 0) {
             container.innerHTML = `<p class="text-gray-600 px-4">No restaurants match your selected cuisines.</p>`;
@@ -720,7 +897,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
                 <p>${place.formatted_address || "No address available"}</p>
                 <p class="text-yellow-600">⭐ ${place.rating || "N/A"}</p>
-                <p class="text-gray-700">💲 ${priceSigns}</p>
+                <p class="text-gray-700"> ${priceSigns}</p>
             `;
 
             const addButton = document.createElement("button");
@@ -749,15 +926,27 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
         // Filter summary
-    function showFilterSummary({ cuisines = [], price = "" }) {
+    function showFilterSummary({ cuisines = [], price = "", reviews = "" }) {
         const summary = document.getElementById("filterSummary");
         const text = document.getElementById("filterSummaryText");
 
         let summaryText = "";
-        if (cuisines.length > 0) summaryText += `🍴 Cuisine: ${cuisines.join(", ")}`;
+
+        // Cuisine
+        if (cuisines.length > 0) {
+            summaryText += `🍴 Cuisine: ${cuisines.join(", ")}`;
+        }
+
+        // Price
         if (price) {
             if (summaryText) summaryText += " | ";
             summaryText += price === "asc" ? "$ → $$$$" : "$$$$ → $";
+        }
+
+        // Reviews
+        if (reviews) {
+            if (summaryText) summaryText += " | ";
+            summaryText += reviews === "asc" ? "⭐ Low → High" : "⭐ High → Low";
         }
 
         text.textContent = summaryText || "";
@@ -768,8 +957,8 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         window.scrollTo({ top: 0, behavior: "smooth" });
-
     }
+
 
     function clearFilters() {
         const summary = document.getElementById("filterSummary");
@@ -802,7 +991,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
                 <p>${place.formatted_address || "No address available"}</p>
                 <p class="text-yellow-600">⭐ ${place.rating || "N/A"}</p>
-                <p class="text-gray-700">💲 ${priceSigns}</p>
+                <p class="text-gray-700">${priceSigns}</p>
             `;
 
             const addButton = document.createElement("button");
