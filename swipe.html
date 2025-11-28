@@ -14,19 +14,8 @@
 
 <body class="mx-auto max-w-screen-lg my-2 bg-[#FFF6E9]">
     <header>
-        <div class="menu flex flex-row justify-between overflow-visible relative z-[10000]">
+        <div class="menu flex flex-row justify-center">
             <img src="./images/binge_invis.png" width="100" class="object-contain pl-3">
-            <div class="relative">
-                <button onclick="myDropdown()"
-                    class="flex hover:bg-gray-400 rounded-lg place-content-end z-[9999] relative"><img src="burger.svg"
-                        id="burger-menu"></button>
-                <ul id="myDropdown" class="hidden absolute right-0 mt-2 bg-white shadow-lg rounded-lg w-40 z-[10000]">
-                    <li class="pr-4 py-2">Cuisine</li>
-                    <li class="pr-4 py-2">Reviews</li>
-                    <li class="pr-4 py-2">Price</li>
-                </ul>
-            </div>
-        </div>
     </header>
     <main class="flex flex-col items-center justify-center min-h-screen bg-orange-300 font-[Nunito_Sans]">
         <div id="card-container" class="relative w-[400px] h-[600px] -translate-y-20">
@@ -36,8 +25,9 @@
 
     <site-footer></site-footer>
 
-    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKJe5Ga1Zc1anQ8ivg617LvGaChAy8aE4&libraries=places"></script>
-    
+    <script async
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKJe5Ga1Zc1anQ8ivg617LvGaChAy8aE4&libraries=places"></script>
+
     <script type="module" src="./src/swipe.js"></script>
 
 </body>

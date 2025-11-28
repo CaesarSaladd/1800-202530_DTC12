@@ -59,6 +59,8 @@ async function populateCrave() {
     });
 }
 
+// Same logic as populateCrave
+
 async function populateReview() {
     auth.onAuthStateChanged(async (user) => {
         if (!user) return;
