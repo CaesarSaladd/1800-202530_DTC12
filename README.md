@@ -1,5 +1,5 @@
 # Binge - Your next favorite food app!
-## Dating is ovverated. Eat good food instead!
+## Dating is overated. Eat good food instead!
 
 ## Overview
 - Elmo Hikes is a client-side JavaScript web application that helps users discover and explore hiking trails. The app displays a curated list of hike trails, each with details such as name, location, difficulty, and an image. Users can browse the list and mark their favorite trails for easy access later.

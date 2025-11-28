@@ -73,11 +73,7 @@ async function writeReview() {
         try {
             const userID = user.uid;
 
-            // 📝 Add a new review document
-            // Extra: Let’s toss in the server timestamp as well.   
-            // We can do this with one extra line of code.   
-            // Reference: https://cloud.google.com/firestore/docs/manage-data/add-data#server_timestamp 
-
+            // 📝 Add a new review document.   
             const restaurantRef = doc(db, "users", userID, "craves", restaurantDocID);
             const restaurantSnap = await getDoc(restaurantRef);
 
@@ -90,7 +86,7 @@ async function writeReview() {
             const restaurantName = restaurantData.name;
             const restaurantAddress = restaurantData.address;
 
-
+            // Add to firebase
             await addDoc(collection(db, "users", userID, "reviews"), {
                 restaurantDocID: restaurantDocID,
                 restaurantName: restaurantName,
@@ -117,7 +113,6 @@ async function writeReview() {
 document.addEventListener('DOMContentLoaded', () => {
     manageStars();
 
-    // 👇👇👇 Add these two lines
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.addEventListener('click', writeReview);
 

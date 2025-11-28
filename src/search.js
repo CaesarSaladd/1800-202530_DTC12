@@ -88,28 +88,29 @@ async function findNearbyRestaurants(location, keyword) {
 
 
     service.textSearch(request, (results, status) => {
-    const container = document.getElementById("resultsContainer");
-    container.innerHTML = "";
-    clearMarkers();
+        const container = document.getElementById("resultsContainer");
+        container.innerHTML = "";
+        clearMarkers();
 
-    // Handle errors or empty results
-    if (status !== google.maps.places.PlacesServiceStatus.OK || !results?.length) {
-        container.innerHTML = `<p class="text-gray-600">No restaurants found.</p>`;
-        window.lastSearchResults = [];
-        return;
-    }
+        // Handle errors or empty results
+        if (status !== google.maps.places.PlacesServiceStatus.OK || !results?.length) {
+            container.innerHTML = `<p class="text-gray-600">No restaurants found.</p>`;
+            window.lastSearchResults = [];
+            return;
+        }
 
-    // Save last search results + keyword for filters
-    window.lastSearchResults = results;
-    window.originalSearchResults = [...results];
-    lastSearchKeyword = keyword || "";
+        // Save last search results + keyword for filters
+        window.lastSearchResults = results;
+        window.originalSearchResults = [...results];
+        lastSearchKeyword = keyword || "";
 
 
         // Loop through each returned restaurant
         results.forEach((place) => {
             // Create a map marker if restaurant exists
             if (place.geometry?.location) {
-                const marker = new google.maps.Marker({map, position: place.geometry.location, title: place.name,
+                const marker = new google.maps.Marker({
+                    map, position: place.geometry.location, title: place.name,
                 });
                 markers.push(marker);
             }
@@ -127,7 +128,7 @@ async function findNearbyRestaurants(location, keyword) {
             // Create an "Add to Craves" button
             const addButton = document.createElement("button");
             addButton.textContent = "+";
-            addButton.className = "ml-2 bg-orange-300 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
+            addButton.className = "ml-2 bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
 
             // "+" adds restaurant to Firestore
             addButton.addEventListener("click", async () => {
@@ -213,39 +214,39 @@ document.addEventListener("DOMContentLoaded", () => {
     // Toggle dropdown
     if (burgerButton && dropdown) {
         burgerButton.addEventListener("click", (event) => {
-        event.stopPropagation();
+            event.stopPropagation();
 
-        // Toggle visiblity of dropdown
-        const willOpen = dropdown.classList.contains("hidden");
-        dropdown.classList.toggle("hidden");
-        isDropdownOpen = willOpen;
+            // Toggle visiblity of dropdown
+            const willOpen = dropdown.classList.contains("hidden");
+            dropdown.classList.toggle("hidden");
+            isDropdownOpen = willOpen;
 
-        // Reset transition when opened
-        if (willOpen) {
-            dropdown.classList.remove("opacity-0", "scale-95");
-            setTimeout(() => {
-            dropdown.classList.add("opacity-100", "scale-100");
-            }, 10);
-        } else {
-            dropdown.classList.remove("opacity-100", "scale-100");
-            dropdown.classList.add("opacity-0", "scale-95");
-        }
+            // Reset transition when opened
+            if (willOpen) {
+                dropdown.classList.remove("opacity-0", "scale-95");
+                setTimeout(() => {
+                    dropdown.classList.add("opacity-100", "scale-100");
+                }, 10);
+            } else {
+                dropdown.classList.remove("opacity-100", "scale-100");
+                dropdown.classList.add("opacity-0", "scale-95");
+            }
         });
 
         // Prevent clicks inside dropdown from closing it
         dropdown.addEventListener("click", (event) => {
-        event.stopPropagation();
+            event.stopPropagation();
         });
 
         // Close dropdown only if click is outside both elements
         document.addEventListener("click", (event) => {
-        if (
-            isDropdownOpen &&
-            !dropdown.contains(event.target) &&
-            !burgerButton.contains(event.target)
-        ) {
-            closeDropdown();
-        }
+            if (
+                isDropdownOpen &&
+                !dropdown.contains(event.target) &&
+                !burgerButton.contains(event.target)
+            ) {
+                closeDropdown();
+            }
         });
     }
 
@@ -259,46 +260,46 @@ document.addEventListener("DOMContentLoaded", () => {
     // Load filters from Firestore database
     async function loadFilters() {
         try {
-        const snapshot = await getDocs(collection(db, "filters"));
-        dropdown.innerHTML = "";
+            const snapshot = await getDocs(collection(db, "filters"));
+            dropdown.innerHTML = "";
 
-        snapshot.forEach((docSnap) => {
-            const data = docSnap.data();
-            const li = document.createElement("li");
-            li.className = "px-4 py-2 hover:bg-gray-100 cursor-pointer";
-            li.textContent = data.filter;
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                const li = document.createElement("li");
+                li.className = "px-4 py-2 hover:bg-gray-100 cursor-pointer";
+                li.textContent = data.filter;
 
-            if (data.filter.toLowerCase() === "cuisine") {
-            li.addEventListener("click", (event) => {
-                event.stopPropagation();
-                showCuisineOptions();
+                if (data.filter.toLowerCase() === "cuisine") {
+                    li.addEventListener("click", (event) => {
+                        event.stopPropagation();
+                        showCuisineOptions();
+                    });
+                }
+
+                if (data.filter.toLowerCase() === "price") {
+                    li.addEventListener("click", (event) => {
+                        event.stopPropagation();
+                        showPriceOptions();
+                    });
+                }
+
+                if (data.filter.toLowerCase() === "reviews") {
+                    li.addEventListener("click", (event) => {
+                        event.stopPropagation();
+                        showReviewOptions();
+                    });
+                }
+
+                dropdown.appendChild(li);
             });
-            }
-
-            if (data.filter.toLowerCase() === "price") {
-                li.addEventListener("click", (event) => {
-                    event.stopPropagation();
-                    showPriceOptions();
-                });
-            }
-
-            if (data.filter.toLowerCase() === "reviews") {
-                li.addEventListener("click", (event) => {
-                    event.stopPropagation();
-                    showReviewOptions();
-                });
-            }
-
-            dropdown.appendChild(li);
-        });
         } catch (err) {
-        console.error("Error loading filters:", err);
-        dropdown.innerHTML =
-            '<li class="px-4 py-2 text-red-500">Failed to load filters</li>';
+            console.error("Error loading filters:", err);
+            dropdown.innerHTML =
+                '<li class="px-4 py-2 text-red-500">Failed to load filters</li>';
         }
     }
 
-        // Cusisine options
+    // Cusisine options
     async function showCuisineOptions() {
         dropdown.innerHTML = "";
 
@@ -543,7 +544,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const addButton = document.createElement("button");
             addButton.textContent = "+";
-            addButton.className = "ml-2 bg-orange-300 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
+            addButton.className = "ml-2 bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
             addButton.addEventListener("click", async () => {
                 await addToCrave(addButton, {
                     name: place.name,
@@ -710,7 +711,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Add “Add to Craves” button
                 const addButton = document.createElement("button");
                 addButton.textContent = "+";
-                addButton.className = "ml-2 bg-orange-300 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
+                addButton.className = "ml-2 bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
                 addButton.addEventListener("click", async () => {
                     await addToCrave(addButton, {
                         name: place.name,
@@ -729,7 +730,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     }
-        // Cuisine and Price combined
+    // Cuisine and Price combined
     async function findAndSortByCuisineAndPrice(location, keyword, order = "desc") {
         resetToOriginal();
         const latLng = new google.maps.LatLng(location.lat, location.lng);
@@ -778,12 +779,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                     <p>${place.formatted_address || "No address available"}</p>
                     <p class="text-yellow-600"> ${place.rating || "N/A"}</p>
-                    <p class="text-gray-700"> ${priceSigns|| "N/A"}</p>
+                    <p class="text-gray-700"> ${priceSigns || "N/A"}</p>
                 `;
 
                 const addButton = document.createElement("button");
                 addButton.textContent = "+";
-                addButton.className = "ml-2 bg-orange-300 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
+                addButton.className = "ml-2 bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
                 addButton.addEventListener("click", async () => {
                     await addToCrave(addButton, {
                         name: place.name,
@@ -804,7 +805,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-        // Sort existing search results by price
+    // Sort existing search results by price
     function sortExistingResultsByPrice(order = "desc") {
         const container = document.getElementById("resultsContainer");
         container.innerHTML = "";
@@ -835,12 +836,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
                 <p>${place.formatted_address || "No address available"}</p>
                 <p class="text-yellow-600"> ${place.rating || "N/A"}</p>
-                <p class="text-gray-700"> ${priceSigns|| "N/A"}</p>
+                <p class="text-gray-700"> ${priceSigns || "N/A"}</p>
             `;
 
             const addButton = document.createElement("button");
             addButton.textContent = "+";
-            addButton.className = "ml-2 bg-orange-300 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
+            addButton.className = "ml-2 bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
             addButton.addEventListener("click", async () => {
                 await addToCrave(addButton, {
                     name: place.name,
@@ -902,7 +903,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const addButton = document.createElement("button");
             addButton.textContent = "+";
-            addButton.className = "ml-2 bg-orange-300 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
+            addButton.className = "ml-2 bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
             addButton.addEventListener("click", async () => {
                 await addToCrave(addButton, {
                     name: place.name,
@@ -925,7 +926,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-        // Filter summary
+    // Filter summary
     function showFilterSummary({ cuisines = [], price = "", reviews = "" }) {
         const summary = document.getElementById("filterSummary");
         const text = document.getElementById("filterSummaryText");
@@ -996,7 +997,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const addButton = document.createElement("button");
             addButton.textContent = "+";
-            addButton.className = "ml-2 bg-orange-300 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
+            addButton.className = "ml-2 bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
             addButton.addEventListener("click", async () => {
                 await addToCrave(addButton, {
                     name: place.name,
