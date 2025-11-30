@@ -24,6 +24,7 @@ async function populateCrave() {
                 let restaurantName = data.name;
                 let restaurantRating = data.rating || "N/A";  // Default to "N/A" if no rating
                 let restaurantAddress = data.address || "N/A";
+                let placeId = data.place_id || data.id; // Use place_id if available, fallback to id
 
                 // Clone the template content
                 const craveCard = craveCardTemplate.content.cloneNode(true);
@@ -33,6 +34,21 @@ async function populateCrave() {
                 craveCard.querySelector(".craveName").textContent = restaurantName;  // Update the restaurant name
                 craveCard.querySelector(".craveReview").textContent = restaurantRating + "★";  // Update the restaurant rating
                 craveCard.querySelector(".craveAddress").textContent = restaurantAddress; // Update restaurant address
+                
+                // Set up menu link
+                const menuLink = craveCard.querySelector(".viewMenuLink");
+                if (menuLink && placeId) {
+                    menuLink.href = `https://www.google.com/maps/place/?q=place_id:${placeId}`;
+                    menuLink.target = "_blank";
+                    menuLink.rel = "noopener noreferrer";
+                } else if (menuLink) {
+                    // If no place_id, use restaurant name and address for search
+                    const searchQuery = encodeURIComponent(`${restaurantName} ${restaurantAddress}`);
+                    menuLink.href = `https://www.google.com/maps/search/?api=1&query=${searchQuery}`;
+                    menuLink.target = "_blank";
+                    menuLink.rel = "noopener noreferrer";
+                }
+                
                 let deleteButton = craveCard.querySelector(".delButton")
 
 

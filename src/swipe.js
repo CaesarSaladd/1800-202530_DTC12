@@ -4,7 +4,7 @@
     }
 
     let nextPageToken = null;
-    let searchRadius = 3000; // Increased from 1200 to 3000m for downtown Vancouver
+    let searchRadius = 3000; // 3000m for downtown Vancouver
     const MAX_RADIUS = 5000;
 
     import { Stack, Direction } from "swing";
@@ -178,7 +178,7 @@
             "brazilian": ["brazilian", "churrasco", "brazil", "rodizio"]
         };
 
-        // Check name for cuisine keywords (prioritize this over generic types)
+        // Check name for cuisine keywords
         for (const [cuisine, keywords] of Object.entries(cuisineKeywords)) {
             for (const keyword of keywords) {
                 if (name.includes(keyword)) {
@@ -380,7 +380,7 @@
                 return t.some(type => allowedTypes.includes(type));
             });
 
-            // Map results and fetch photos if needed (with rate limiting)
+            // Map results and fetch photos if needed
             let mapped = [];
             for (let i = 0; i < filtered.length; i++) {
                 const p = filtered[i];
@@ -479,7 +479,7 @@ onAuthStateChanged(auth, async (user) => {
                 return;
             }
 
-            // skip restaurants not in Vancouver (since we're searching from downtown with 3km radius)
+            // skip restaurants not in Vancouver
             if (!isInVancouver(p.formatted_address)) {
                 console.log(`Skipping ${p.name} - not in Vancouver: ${p.formatted_address}`);
                 return;
@@ -516,14 +516,14 @@ onAuthStateChanged(auth, async (user) => {
         }
 
 
-        // Only create stack if at least 1 restaurant exists (reduced from 10 for testing)
+        // Only create stack if at least 1 restaurant exists
         if (restaurants.length === 0) {
             statusEl.textContent = "No restaurants found. Please try again.";
             console.error("No restaurants available after filtering. Check console for details.");
             return;
         }
         
-        // Add initial cards to UI + bind to Swing (use available restaurants, up to 10)
+        // Add initial cards to UI + bind to Swing
         const cardsToAdd = Math.min(restaurants.length, 10);
         console.log(`Adding ${cardsToAdd} cards to UI out of ${restaurants.length} available restaurants`);
         addCardsToUI(restaurants.slice(0, cardsToAdd), stack);
@@ -600,6 +600,7 @@ onAuthStateChanged(auth, async (user) => {
                     name: restaurantName,
                     address,
                     rating,
+                    place_id: placeId, // Store place_id for menu link
                     added_at: serverTimestamp(),
                 });
 
@@ -718,7 +719,7 @@ function addCardsToUI(restaurants, stack) {
         card.innerHTML = `
             <div class="relative w-full h-full rounded-2xl overflow-hidden bg-gray-200">
             </div>
-            <div class="absolute bottom-0 p-4 text-left text-white z-10">
+            <div class="absolute bottom-0 p-4 pb-5 text-left text-white z-10">
                 <div class="mb-2">
                     <span class="bg-orange-500/95 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">${cuisineType}</span>
                 </div>
@@ -728,6 +729,9 @@ function addCardsToUI(restaurants, stack) {
                         <span class="rating-value">⭐ ${place.rating}</span>
                     ${priceSigns ? `<span class="ml-2 text-white/90">${priceSigns}</span>` : ''}
                 </div>
+                <a href="https://www.google.com/maps/place/?q=place_id:${place.id}" target="_blank" rel="noopener noreferrer" class="mt-2 mb-1 inline-block bg-white/90 text-orange-600 px-3 py-1 rounded-lg text-xs font-semibold hover:bg-white transition-colors">
+                    View Menu
+                </a>
             </div>
         `;
 
@@ -735,7 +739,7 @@ function addCardsToUI(restaurants, stack) {
         const imageContainer = card.querySelector(".relative");
         imageContainer.insertBefore(img, imageContainer.firstChild);
         
-        // Add card to container immediately (we'll remove it if image fails)
+        // Add card to container immediately
         cardContainer.appendChild(card);
         
         // Set up error handling - remove card if image fails to load

@@ -20,7 +20,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!snap.exists()) return console.log("User document not found");
 
             const data = snap.data();
-            usernameInput.value = data.name || "";  // <-- now using "name"
+            const currentName = data.name || user.displayName || "";
+            usernameInput.value = currentName;  // Display current username
+            usernameInput.placeholder = currentName || "Enter username";  // Show as placeholder if empty
         } catch (err) {
             console.error("Error loading name:", err);
         }
@@ -31,6 +33,10 @@ document.addEventListener("DOMContentLoaded", () => {
         fieldset.disabled = false;
         editBtn.disabled = true;
         saveBtn.disabled = false;
+        // Focus the username input and place cursor at the end
+        usernameInput.focus();
+        // Move cursor to end of text
+        usernameInput.setSelectionRange(usernameInput.value.length, usernameInput.value.length);
     });
 
     // Save to Firestore
