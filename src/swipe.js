@@ -16,7 +16,7 @@
     // Downtown Vancouver coordinates
     const DOWNTOWN_VANCOUVER = { lat: 49.2827, lng: -123.1207 };
 
-    // Simple distance calculation using Pythagorean theorem
+    // Simple distance calculation using Pythagorean theorem (I used AI to perform this calculation)
     // Works well for short distances (within a city)
     function calculateDistance(lat1, lng1, lat2, lng2) {
         // Convert latitude/longitude differences to meters
