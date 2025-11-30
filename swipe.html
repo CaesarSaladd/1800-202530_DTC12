@@ -14,8 +14,12 @@
 
 <body class="mx-auto max-w-screen-lg my-2 bg-[#FFF6E9]">
     <header>
-        <div class="menu flex flex-row justify-center">
+        <div class="menu flex flex-row justify-center items-center gap-4">
             <img src="./images/binge_invis.png" width="100" class="object-contain pl-3">
+            <button id="show-tutorial-btn" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
+                How to Swipe
+            </button>
+        </div>
     </header>
     <main class="flex flex-col items-center justify-center min-h-screen bg-orange-300 font-[Nunito_Sans] overflow-hidden relative">
         <!-- Desktop Fixed Indicators (hidden on mobile) -->
@@ -33,8 +37,8 @@
             </div>
         </div>
         
-        <!-- Mobile Tutorial Popup -->
-        <div id="swipe-tutorial" class="md:hidden fixed inset-0 bg-black/60 z-30 flex items-center justify-center p-4">
+        <!-- Tutorial Popup -->
+        <div id="swipe-tutorial" class="fixed inset-0 bg-black/60 z-30 flex items-center justify-center p-4 hidden">
             <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl relative">
                 <button id="close-tutorial" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl font-bold">×</button>
                 <h3 class="text-xl font-bold mb-4 text-center">How to Swipe</h3>

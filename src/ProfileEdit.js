@@ -59,6 +59,9 @@ document.addEventListener("DOMContentLoaded", () => {
             await updateProfile(user, { displayName: name });
             console.log("Name successfully updated:", name);
 
+            // Show success alert
+            alert(`Username successfully updated to "${name}"!`);
+
             // Disable editing again
             fieldset.disabled = true;
             editBtn.disabled = false;

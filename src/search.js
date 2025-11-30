@@ -50,6 +50,8 @@ async function addToCrave(parentElement, restaurantData) {
 
 // --------- MAP + PLACES SETUP ----------
 let map, service, markers = [];
+let userLocationMarker = null;
+let userLocation = null;
 let lastSearchKeyword = "";
 
 
@@ -60,6 +62,110 @@ let lastSearchKeyword = "";
 function clearMarkers() {
     markers.forEach(m => m.setMap(null));
     markers = [];
+    // Keep user location marker
+}
+
+// Helper function to create a restaurant card with distance
+function createRestaurantCard(place, container) {
+    // Calculate distance if user location is available and not already calculated
+    if (userLocation && navigator.geolocation && !place.distance && place.geometry?.location) {
+        const placeLat = place.geometry.location.lat();
+        const placeLng = place.geometry.location.lng();
+        place.distance = calculateDistance(
+            userLocation.lat,
+            userLocation.lng,
+            placeLat,
+            placeLng
+        );
+    }
+
+    // Only show distance if user location is available
+    const distanceText = (userLocation && navigator.geolocation && place.distance) ? formatDistance(place.distance) : null;
+    const priceSigns = place.price_level && place.price_level > 0 ? "$".repeat(place.price_level) : null;
+
+    const card = document.createElement("div");
+    card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
+    card.innerHTML = `
+        <div class="flex justify-between items-start mb-2">
+            <h3 class="font-bold">${place.name}</h3>
+        </div>
+        <p>${place.formatted_address || "No address available"}</p>
+        <div class="flex items-center gap-2 mt-1">
+            <p class="text-yellow-600">⭐ ${place.rating || "N/A"}</p>
+            ${distanceText ? `<p class="text-gray-600 text-sm">📍 ${distanceText}</p>` : ''}
+        </div>
+        ${priceSigns ? `<p class="text-gray-700">${priceSigns}</p>` : ''}
+    `;
+
+    // Add "Add to Craves" button
+    const addButton = document.createElement("button");
+    addButton.textContent = "+";
+    addButton.className = "ml-2 bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
+    addButton.addEventListener("click", async () => {
+        await addToCrave(addButton, {
+            name: place.name,
+            formattedAddress: place.formatted_address,
+            rating: place.rating,
+        });
+        addButton.textContent = "✓ Added";
+        addButton.disabled = true;
+        addButton.classList.add("opacity-70");
+    });
+
+    const headerDiv = card.querySelector("div");
+    headerDiv.appendChild(addButton);
+    container.appendChild(card);
+}
+
+// Calculate distance between two coordinates in meters
+function calculateDistance(lat1, lng1, lat2, lng2) {
+    const R = 6371e3; // Earth's radius in meters
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lng2 - lng1) * Math.PI / 180;
+
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // Distance in meters
+}
+
+// Format distance for display
+function formatDistance(meters) {
+    if (meters < 1000) {
+        return Math.round(meters) + "m";
+    } else {
+        return (meters / 1000).toFixed(1) + "km";
+    }
+}
+
+// Add user location marker to map
+function addUserLocationMarker(location) {
+    // Remove existing user location marker if any
+    if (userLocationMarker) {
+        userLocationMarker.setMap(null);
+    }
+
+    // Create a custom icon for user location (blue circle)
+    const userIcon = {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 8,
+        fillColor: "#4285F4",
+        fillOpacity: 1,
+        strokeColor: "#FFFFFF",
+        strokeWeight: 2,
+    };
+
+    userLocationMarker = new google.maps.Marker({
+        position: { lat: location.lat, lng: location.lng },
+        map: map,
+        icon: userIcon,
+        title: "Your Location",
+        zIndex: 1000, // Ensure it's on top
+    });
 }
 
 // function waitForGoogleMaps() {
@@ -77,6 +183,14 @@ function clearMarkers() {
 // Use Google API to text search restaurants based on user location or keyword search
 async function findNearbyRestaurants(location, keyword) {
     const latLng = new google.maps.LatLng(location.lat, location.lng);
+
+    // Store user location if geolocation is enabled
+    userLocation = location;
+
+    // Add user location marker if we have a valid location (not default downtown)
+    if (navigator.geolocation && location.lat !== 49.282868 && location.lng !== -123.125032) {
+        addUserLocationMarker(location);
+    }
 
     const request = {
         query: keyword ? `${keyword} restaurant` : "restaurants near me",
@@ -99,6 +213,27 @@ async function findNearbyRestaurants(location, keyword) {
             return;
         }
 
+        // Calculate distances and add to results if user location is available
+        if (userLocation && navigator.geolocation) {
+            results.forEach(place => {
+                if (place.geometry?.location) {
+                    const placeLat = place.geometry.location.lat();
+                    const placeLng = place.geometry.location.lng();
+                    place.distance = calculateDistance(
+                        userLocation.lat,
+                        userLocation.lng,
+                        placeLat,
+                        placeLng
+                    );
+                } else {
+                    place.distance = Infinity; // No location, put at end
+                }
+            });
+
+            // Sort by distance (closest first)
+            results.sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
+        }
+
         // Save last search results + keyword for filters
         window.lastSearchResults = results;
         window.originalSearchResults = [...results];
@@ -115,39 +250,8 @@ async function findNearbyRestaurants(location, keyword) {
                 markers.push(marker);
             }
 
-            // Restaurant info card
-            const card = document.createElement("div");
-            card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
-            card.innerHTML = `
-                <div class="flex justify-between items-start mb-2">
-                <h3 class="font-bold">${place.name}</h3>
-                </div>
-                <p>${place.formatted_address || "No address available"}</p>
-                <p class="text-yellow-600"> ${place.rating || "N/A"}</p>
-            `;
-            // Create an "Add to Craves" button
-            const addButton = document.createElement("button");
-            addButton.textContent = "+";
-            addButton.className = "ml-2 bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
-
-            // "+" adds restaurant to Firestore
-            addButton.addEventListener("click", async () => {
-                await addToCrave(addButton, {
-                    name: place.name,
-                    formattedAddress: place.formatted_address,
-                    rating: place.rating,
-                });
-                // Disable button after clicked
-                addButton.textContent = "✓ Added";
-                addButton.disabled = true;
-                addButton.classList.add("opacity-70");
-            });
-
-            // Add button to card
-            const headerDiv = card.querySelector("div");
-            headerDiv.appendChild(addButton);
-
-            container.appendChild(card);
+            // Use helper function to create card with directions button
+            createRestaurantCard(place, container);
         });
     });
 }
@@ -163,11 +267,18 @@ async function initMap() {
     // Places services instance linked to map (from Google)
     const service = new google.maps.places.PlacesService(map);
 
-    // Center mapp and search based on user location
+    // Center map and search based on user location
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-            pos => findNearbyRestaurants({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-            () => findNearbyRestaurants({ lat: 49.282868, lng: -123.125032 })
+            (pos) => {
+                const userPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                map.setCenter(userPos);
+                findNearbyRestaurants(userPos);
+            },
+            () => {
+                findNearbyRestaurants({ lat: 49.282868, lng: -123.125032 });
+            },
+            { enableHighAccuracy: true }
         );
     } else {
         findNearbyRestaurants({ lat: 49.282868, lng: -123.125032 });
@@ -182,8 +293,13 @@ async function initMap() {
             const keyword = searchInput.value.trim();
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    pos => findNearbyRestaurants({ lat: pos.coords.latitude, lng: pos.coords.longitude }, keyword),
-                    () => findNearbyRestaurants({ lat: 49.282868, lng: -123.125032 }, keyword)
+                    (pos) => {
+                        const userPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                        map.setCenter(userPos);
+                        findNearbyRestaurants(userPos, keyword);
+                    },
+                    () => findNearbyRestaurants({ lat: 49.282868, lng: -123.125032 }, keyword),
+                    { enableHighAccuracy: true }
                 );
             } else {
                 findNearbyRestaurants({ lat: 49.282868, lng: -123.125032 }, keyword);
@@ -477,10 +593,33 @@ document.addEventListener("DOMContentLoaded", () => {
         container.innerHTML = "";
         clearMarkers();
 
-        const sorted = [...window.lastSearchResults].sort((a, b) => {
+        const sorted = [...window.lastSearchResults];
+        
+        // Calculate distances if user location is available
+        if (userLocation && navigator.geolocation) {
+            sorted.forEach(place => {
+                if (place.geometry?.location && !place.distance) {
+                    const placeLat = place.geometry.location.lat();
+                    const placeLng = place.geometry.location.lng();
+                    place.distance = calculateDistance(
+                        userLocation.lat,
+                        userLocation.lng,
+                        placeLat,
+                        placeLng
+                    );
+                }
+            });
+        }
+
+        sorted.sort((a, b) => {
             const ratingA = a.rating || 0;
             const ratingB = b.rating || 0;
-            return order === "asc" ? ratingA - ratingB : ratingB - ratingA;
+            const ratingSort = order === "asc" ? ratingA - ratingB : ratingB - ratingA;
+            if (ratingSort === 0 && userLocation && navigator.geolocation) {
+                // If ratings are equal, sort by distance
+                return (a.distance || Infinity) - (b.distance || Infinity);
+            }
+            return ratingSort;
         });
 
         renderResultCards(sorted);
@@ -490,6 +629,12 @@ document.addEventListener("DOMContentLoaded", () => {
     function findAndSortByReviews(location, order = "desc") {
         const latLng = new google.maps.LatLng(location.lat, location.lng);
         const service = new google.maps.places.PlacesService(map);
+
+        // Store user location if geolocation is enabled
+        if (navigator.geolocation && location.lat !== 49.282868 && location.lng !== -123.125032) {
+            userLocation = location;
+            addUserLocationMarker(location);
+        }
 
         const request = {
             query: "restaurant",
@@ -507,10 +652,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // Calculate distances if user location is available
+            if (userLocation && navigator.geolocation) {
+                results.forEach(place => {
+                    if (place.geometry?.location && !place.distance) {
+                        const placeLat = place.geometry.location.lat();
+                        const placeLng = place.geometry.location.lng();
+                        place.distance = calculateDistance(
+                            userLocation.lat,
+                            userLocation.lng,
+                            placeLat,
+                            placeLng
+                        );
+                    }
+                });
+            }
+
             results.sort((a, b) => {
                 const ratingA = a.rating || 0;
                 const ratingB = b.rating || 0;
-                return order === "asc" ? ratingA - ratingB : ratingB - ratingA;
+                const ratingSort = order === "asc" ? ratingA - ratingB : ratingB - ratingA;
+                if (ratingSort === 0 && userLocation && navigator.geolocation) {
+                    // If ratings are equal, sort by distance
+                    return (a.distance || Infinity) - (b.distance || Infinity);
+                }
+                return ratingSort;
             });
 
             renderResultCards(results);
@@ -522,6 +688,27 @@ document.addEventListener("DOMContentLoaded", () => {
         container.innerHTML = "";
         clearMarkers();
 
+        // Calculate distances if user location is available
+        if (userLocation && navigator.geolocation) {
+            results.forEach(place => {
+                if (place.geometry?.location && !place.distance) {
+                    const placeLat = place.geometry.location.lat();
+                    const placeLng = place.geometry.location.lng();
+                    place.distance = calculateDistance(
+                        userLocation.lat,
+                        userLocation.lng,
+                        placeLat,
+                        placeLng
+                    );
+                } else if (!place.geometry?.location) {
+                    place.distance = Infinity;
+                }
+            });
+
+            // Sort by distance (closest first)
+            results.sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
+        }
+
         results.forEach((place) => {
             if (place.geometry?.location) {
                 const marker = new google.maps.Marker({
@@ -532,7 +719,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 markers.push(marker);
             }
 
-            const priceSigns = place.price_level ? "$".repeat(place.price_level) : "N/A";
+            const priceSigns = place.price_level && place.price_level > 0 ? "$".repeat(place.price_level) : null;
+            // Only show distance if user location is available
+            const distanceText = (userLocation && navigator.geolocation && place.distance) ? formatDistance(place.distance) : null;
 
             const card = document.createElement("div");
             card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
@@ -541,8 +730,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     <h3 class="font-bold">${place.name}</h3>
                 </div>
                 <p>${place.formatted_address || "No address available"}</p>
-                <p class="text-yellow-600">⭐ ${place.rating || "N/A"}</p>
-                <p class="text-gray-700"> ${priceSigns}</p>
+                <div class="flex items-center gap-2 mt-1">
+                    <p class="text-yellow-600">⭐ ${place.rating || "N/A"}</p>
+                    ${distanceText ? `<p class="text-gray-600 text-sm">📍 ${distanceText}</p>` : ''}
+                </div>
+                ${priceSigns ? `<p class="text-gray-700">${priceSigns}</p>` : ''}
             `;
 
             const addButton = document.createElement("button");
@@ -662,6 +854,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const latLng = new google.maps.LatLng(location.lat, location.lng);
         const service = new google.maps.places.PlacesService(map);
 
+        // Store user location if geolocation is enabled
+        if (navigator.geolocation && location.lat !== 49.282868 && location.lng !== -123.125032) {
+            userLocation = location;
+            addUserLocationMarker(location);
+        }
+
         const request = {
             query: "restaurant",
             location: latLng,
@@ -678,12 +876,42 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // Calculate distances if user location is available
+            if (userLocation && navigator.geolocation) {
+                results.forEach(place => {
+                    if (place.geometry?.location && !place.distance) {
+                        const placeLat = place.geometry.location.lat();
+                        const placeLng = place.geometry.location.lng();
+                        place.distance = calculateDistance(
+                            userLocation.lat,
+                            userLocation.lng,
+                            placeLat,
+                            placeLng
+                        );
+                    }
+                });
+            }
+
             // Sort by price ascending or descending
             results.sort((a, b) => {
                 const priceA = a.price_level || 0;
                 const priceB = b.price_level || 0;
                 return order === "asc" ? priceA - priceB : priceB - priceA;
             });
+
+            // If user location is available, also sort by distance as secondary sort
+            if (userLocation && navigator.geolocation) {
+                results.sort((a, b) => {
+                    const priceA = a.price_level || 0;
+                    const priceB = b.price_level || 0;
+                    const priceSort = order === "asc" ? priceA - priceB : priceB - priceA;
+                    if (priceSort === 0) {
+                        // If prices are equal, sort by distance
+                        return (a.distance || Infinity) - (b.distance || Infinity);
+                    }
+                    return priceSort;
+                });
+            }
 
             results.forEach((place) => {
                 // Add map markers
@@ -696,40 +924,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     markers.push(marker);
                 }
 
-                // Convert numeric price level → $, $$, $$$, $$$$
-                const priceSigns = place.price_level ? "$".repeat(place.price_level) : "N/A";
-
-                // Restaurant card
-                const card = document.createElement("div");
-                card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-bold">${place.name}</h3>
-                    </div>
-                    <p>${place.formatted_address || "No address available"}</p>
-                    <p class="text-yellow-600"> ${place.rating || "N/A"}</p>
-                    <p class="text-gray-700"> ${priceSigns || "N/A"}</p>
-                `;
-
-                // Add “Add to Craves” button
-                const addButton = document.createElement("button");
-                addButton.textContent = "+";
-                addButton.className = "ml-2 bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
-                addButton.addEventListener("click", async () => {
-                    await addToCrave(addButton, {
-                        name: place.name,
-                        formattedAddress: place.formatted_address,
-                        rating: place.rating,
-                    });
-                    addButton.textContent = "✓ Added";
-                    addButton.disabled = true;
-                    addButton.classList.add("opacity-70");
-                });
-
-                const headerDiv = card.querySelector("div");
-                headerDiv.appendChild(addButton);
-
-                container.appendChild(card);
+                createRestaurantCard(place, container);
             });
         });
     }
@@ -738,6 +933,12 @@ document.addEventListener("DOMContentLoaded", () => {
         resetToOriginal();
         const latLng = new google.maps.LatLng(location.lat, location.lng);
         const service = new google.maps.places.PlacesService(map);
+
+        // Store user location if geolocation is enabled
+        if (navigator.geolocation && location.lat !== 49.282868 && location.lng !== -123.125032) {
+            userLocation = location;
+            addUserLocationMarker(location);
+        }
 
         const request = {
             query: `${keyword} restaurant`,
@@ -755,11 +956,32 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // Calculate distances if user location is available
+            if (userLocation && navigator.geolocation) {
+                results.forEach(place => {
+                    if (place.geometry?.location && !place.distance) {
+                        const placeLat = place.geometry.location.lat();
+                        const placeLng = place.geometry.location.lng();
+                        place.distance = calculateDistance(
+                            userLocation.lat,
+                            userLocation.lng,
+                            placeLat,
+                            placeLng
+                        );
+                    }
+                });
+            }
+
             // Sort by price order
             results.sort((a, b) => {
                 const priceA = a.price_level || 0;
                 const priceB = b.price_level || 0;
-                return order === "asc" ? priceA - priceB : priceB - priceA;
+                const priceSort = order === "asc" ? priceA - priceB : priceB - priceA;
+                if (priceSort === 0 && userLocation && navigator.geolocation) {
+                    // If prices are equal, sort by distance
+                    return (a.distance || Infinity) - (b.distance || Infinity);
+                }
+                return priceSort;
             });
 
             results.forEach((place) => {
@@ -772,36 +994,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     markers.push(marker);
                 }
 
-                const priceSigns = place.price_level ? "$".repeat(place.price_level) : "N/A";
-
-                const card = document.createElement("div");
-                card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-bold">${place.name}</h3>
-                    </div>
-                    <p>${place.formatted_address || "No address available"}</p>
-                    <p class="text-yellow-600"> ${place.rating || "N/A"}</p>
-                    <p class="text-gray-700"> ${priceSigns || "N/A"}</p>
-                `;
-
-                const addButton = document.createElement("button");
-                addButton.textContent = "+";
-                addButton.className = "ml-2 bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
-                addButton.addEventListener("click", async () => {
-                    await addToCrave(addButton, {
-                        name: place.name,
-                        formattedAddress: place.formatted_address,
-                        rating: place.rating,
-                    });
-                    addButton.textContent = "✓ Added";
-                    addButton.disabled = true;
-                    addButton.classList.add("opacity-70");
-                });
-
-                const headerDiv = card.querySelector("div");
-                headerDiv.appendChild(addButton);
-                container.appendChild(card);
+                createRestaurantCard(place, container);
             });
         });
         showFilterSummary({ cuisines: keyword.split(", "), price: order });
@@ -814,10 +1007,33 @@ document.addEventListener("DOMContentLoaded", () => {
         container.innerHTML = "";
         clearMarkers();
         resetToOriginal();
-        const sorted = [...window.lastSearchResults].sort((a, b) => {
+        
+        // Calculate distances if user location is available
+        const sorted = [...window.lastSearchResults];
+        if (userLocation && navigator.geolocation) {
+            sorted.forEach(place => {
+                if (place.geometry?.location && !place.distance) {
+                    const placeLat = place.geometry.location.lat();
+                    const placeLng = place.geometry.location.lng();
+                    place.distance = calculateDistance(
+                        userLocation.lat,
+                        userLocation.lng,
+                        placeLat,
+                        placeLng
+                    );
+                }
+            });
+        }
+        
+        sorted.sort((a, b) => {
             const priceA = a.price_level || 0;
             const priceB = b.price_level || 0;
-            return order === "asc" ? priceA - priceB : priceB - priceA;
+            const priceSort = order === "asc" ? priceA - priceB : priceB - priceA;
+            if (priceSort === 0 && userLocation && navigator.geolocation) {
+                // If prices are equal, sort by distance
+                return (a.distance || Infinity) - (b.distance || Infinity);
+            }
+            return priceSort;
         });
 
         sorted.forEach((place) => {
@@ -830,35 +1046,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 markers.push(marker);
             }
 
-            const priceSigns = place.price_level ? "$".repeat(place.price_level) : "N/A";
-            const card = document.createElement("div");
-            card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
-            card.innerHTML = `
-                <div class="flex justify-between items-start mb-2">
-                    <h3 class="font-bold">${place.name}</h3>
-                </div>
-                <p>${place.formatted_address || "No address available"}</p>
-                <p class="text-yellow-600"> ${place.rating || "N/A"}</p>
-                <p class="text-gray-700"> ${priceSigns || "N/A"}</p>
-            `;
-
-            const addButton = document.createElement("button");
-            addButton.textContent = "+";
-            addButton.className = "ml-2 bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
-            addButton.addEventListener("click", async () => {
-                await addToCrave(addButton, {
-                    name: place.name,
-                    formattedAddress: place.formatted_address,
-                    rating: place.rating,
-                });
-                addButton.textContent = "✓ Added";
-                addButton.disabled = true;
-                addButton.classList.add("opacity-70");
-            });
-
-            const headerDiv = card.querySelector("div");
-            headerDiv.appendChild(addButton);
-            container.appendChild(card);
+            createRestaurantCard(place, container);
         });
         showFilterSummary({ price: order });
     }
@@ -888,6 +1076,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const latLng = new google.maps.LatLng(location.lat, location.lng);
         const service = new google.maps.places.PlacesService(map);
         
+        // Store user location if geolocation is enabled
+        if (navigator.geolocation && location.lat !== 49.282868 && location.lng !== -123.125032) {
+            userLocation = location;
+            addUserLocationMarker(location);
+        }
+        
         const keyword = selectedCuisines.join(" OR ");
         
         const request = {
@@ -906,6 +1100,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // Calculate distances if user location is available
+            if (userLocation && navigator.geolocation) {
+                results.forEach(place => {
+                    if (place.geometry?.location && !place.distance) {
+                        const placeLat = place.geometry.location.lat();
+                        const placeLng = place.geometry.location.lng();
+                        place.distance = calculateDistance(
+                            userLocation.lat,
+                            userLocation.lng,
+                            placeLat,
+                            placeLng
+                        );
+                    }
+                });
+                // Sort by distance (closest first)
+                results.sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
+            }
+
             // Save results for further filtering
             window.lastSearchResults = results;
             window.originalSearchResults = [...results];
@@ -920,35 +1132,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     markers.push(marker);
                 }
 
-                const priceSigns = place.price_level ? "$".repeat(place.price_level) : "N/A";
-                const card = document.createElement("div");
-                card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-bold">${place.name}</h3>
-                    </div>
-                    <p>${place.formatted_address || "No address available"}</p>
-                    <p class="text-yellow-600">⭐ ${place.rating || "N/A"}</p>
-                    <p class="text-gray-700">${priceSigns}</p>
-                `;
-
-                const addButton = document.createElement("button");
-                addButton.textContent = "+";
-                addButton.className = "ml-2 bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
-                addButton.addEventListener("click", async () => {
-                    await addToCrave(addButton, {
-                        name: place.name,
-                        formattedAddress: place.formatted_address,
-                        rating: place.rating,
-                    });
-                    addButton.textContent = "✓ Added";
-                    addButton.disabled = true;
-                    addButton.classList.add("opacity-70");
-                });
-
-                const headerDiv = card.querySelector("div");
-                headerDiv.appendChild(addButton);
-                container.appendChild(card);
+                createRestaurantCard(place, container);
             });
 
             showFilterSummary({ cuisines: selectedCuisines });
@@ -998,6 +1182,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
         window.lastSearchResults = [...window.originalSearchResults];
 
+        // Recalculate distances if user location is available
+        if (userLocation && navigator.geolocation) {
+            window.lastSearchResults.forEach(place => {
+                if (place.geometry?.location) {
+                    const placeLat = place.geometry.location.lat();
+                    const placeLng = place.geometry.location.lng();
+                    place.distance = calculateDistance(
+                        userLocation.lat,
+                        userLocation.lng,
+                        placeLat,
+                        placeLng
+                    );
+                }
+            });
+            // Sort by distance (closest first)
+            window.lastSearchResults.sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
+        }
+
         const container = document.getElementById("resultsContainer");
         container.innerHTML = "";
         clearMarkers();
@@ -1012,35 +1214,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 markers.push(marker);
             }
 
-            const priceSigns = place.price_level ? "$".repeat(place.price_level) : "N/A";
-            const card = document.createElement("div");
-            card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
-            card.innerHTML = `
-                <div class="flex justify-between items-start mb-2">
-                    <h3 class="font-bold">${place.name}</h3>
-                </div>
-                <p>${place.formatted_address || "No address available"}</p>
-                <p class="text-yellow-600">⭐ ${place.rating || "N/A"}</p>
-                <p class="text-gray-700">${priceSigns}</p>
-            `;
-
-            const addButton = document.createElement("button");
-            addButton.textContent = "+";
-            addButton.className = "ml-2 bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
-            addButton.addEventListener("click", async () => {
-                await addToCrave(addButton, {
-                    name: place.name,
-                    formattedAddress: place.formatted_address,
-                    rating: place.rating,
-                });
-                addButton.textContent = "✓ Added";
-                addButton.disabled = true;
-                addButton.classList.add("opacity-70");
-            });
-
-            const headerDiv = card.querySelector("div");
-            headerDiv.appendChild(addButton);
-            container.appendChild(card);
+            createRestaurantCard(place, container);
         });
 
         window.scrollTo({ top: 0, behavior: "smooth" });

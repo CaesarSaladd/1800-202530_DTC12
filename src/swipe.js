@@ -6,6 +6,7 @@
     let nextPageToken = null;
     let searchRadius = 3000; // 3000m for downtown Vancouver
     const MAX_RADIUS = 5000;
+    let userLocation = null; // Store user's current location
 
     import { Stack, Direction } from "swing";
     import { db, auth } from "./firebaseConfig.js";
@@ -14,6 +15,31 @@
 
     // Downtown Vancouver coordinates
     const DOWNTOWN_VANCOUVER = { lat: 49.2827, lng: -123.1207 };
+
+    // Calculate distance between two coordinates in meters (Haversine formula)
+    function calculateDistance(lat1, lng1, lat2, lng2) {
+        const R = 6371e3; // Earth's radius in meters
+        const φ1 = lat1 * Math.PI / 180;
+        const φ2 = lat2 * Math.PI / 180;
+        const Δφ = (lat2 - lat1) * Math.PI / 180;
+        const Δλ = (lng2 - lng1) * Math.PI / 180;
+
+        const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                  Math.cos(φ1) * Math.cos(φ2) *
+                  Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c; // Distance in meters
+    }
+
+    // Format distance for display
+    function formatDistance(meters) {
+        if (meters < 1000) {
+            return Math.round(meters) + "m";
+        } else {
+            return (meters / 1000).toFixed(1) + "km";
+        }
+    }
 
     // Load google maps
     async function waitForGoogleMaps() {
@@ -350,7 +376,8 @@
                         rating: p.rating || "N/A",
                         price_level: p.price_level || "N/A",
                         types: p.types || [],
-                        photoUrl: photoUrl
+                        photoUrl: photoUrl,
+                        geometry: p.geometry // Store geometry for distance calculation
                     });
                 }
             }
@@ -404,7 +431,8 @@
                 rating: p.rating || "N/A",
                 price_level: p.price_level || "N/A",
                 types: p.types || [],
-                        photoUrl: photoUrl
+                        photoUrl: photoUrl,
+                        geometry: p.geometry // Store geometry for distance calculation
                     });
                 }
             }
@@ -433,6 +461,24 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     console.log("Logged in as:", user.email);
+
+    // Get user's current location if available
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                console.log("User location obtained:", userLocation);
+            },
+            (error) => {
+                console.log("Geolocation not available or denied:", error);
+                userLocation = null;
+            },
+            { enableHighAccuracy: true, timeout: 7000 }
+        );
+    }
 
     const cardContainer = document.getElementById("card-container");
     const statusEl = document.getElementById("status");
@@ -535,22 +581,43 @@ onAuthStateChanged(auth, async (user) => {
         const tutorialEl = document.getElementById("swipe-tutorial");
         const closeTutorialBtn = document.getElementById("close-tutorial");
         const gotItBtn = document.getElementById("got-it-btn");
+        const showTutorialBtn = document.getElementById("show-tutorial-btn");
         const TUTORIAL_SEEN_KEY = "swipe-tutorial-seen";
         
         // Check if user has seen tutorial before
         const hasSeenTutorial = localStorage.getItem(TUTORIAL_SEEN_KEY) === "true";
         
-        // Hide tutorial if user has seen it before
-        if (hasSeenTutorial && tutorialEl) {
-            tutorialEl.style.display = "none";
+        // Function to show tutorial
+        function showTutorial() {
+            if (tutorialEl) {
+                tutorialEl.classList.remove("hidden");
+            }
+        }
+        
+        // Show tutorial only if user hasn't seen it before (on mobile only - desktop users can use button)
+        if (tutorialEl) {
+            // Check if on mobile (screen width < 768px)
+            const isMobile = window.innerWidth < 768;
+            if (hasSeenTutorial || !isMobile) {
+                // Hide tutorial if user has seen it before, or if on desktop
+                tutorialEl.classList.add("hidden");
+            } else {
+                // Show tutorial if user hasn't seen it and is on mobile (remove hidden class)
+                tutorialEl.classList.remove("hidden");
+            }
         }
         
         function closeTutorial() {
-            if (tutorialEl && tutorialEl.style.display !== "none") {
-                tutorialEl.style.display = "none";
+            if (tutorialEl && !tutorialEl.classList.contains("hidden")) {
+                tutorialEl.classList.add("hidden");
                 // Save to localStorage that user has seen the tutorial
                 localStorage.setItem(TUTORIAL_SEEN_KEY, "true");
             }
+        }
+        
+        // Button to show tutorial
+        if (showTutorialBtn) {
+            showTutorialBtn.addEventListener("click", showTutorial);
         }
         
         if (closeTutorialBtn) {
@@ -716,6 +783,25 @@ function addCardsToUI(restaurants, stack) {
         
         const streetName = getStreetName(place.formatted_address);
 
+        // Calculate distance if user location is available
+        let distanceText = null;
+        if (userLocation && navigator.geolocation && place.geometry?.location) {
+            const placeLat = typeof place.geometry.location.lat === 'function' 
+                ? place.geometry.location.lat() 
+                : place.geometry.location.lat;
+            const placeLng = typeof place.geometry.location.lng === 'function' 
+                ? place.geometry.location.lng() 
+                : place.geometry.location.lng;
+            
+            const distance = calculateDistance(
+                userLocation.lat,
+                userLocation.lng,
+                placeLat,
+                placeLng
+            );
+            distanceText = formatDistance(distance);
+        }
+
         card.innerHTML = `
             <div class="relative w-full h-full rounded-2xl overflow-hidden bg-gray-200">
             </div>
@@ -728,6 +814,7 @@ function addCardsToUI(restaurants, stack) {
                 <div class="flex items-center mt-1 text-yellow-400 text-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]">
                         <span class="rating-value">⭐ ${place.rating}</span>
                     ${priceSigns ? `<span class="ml-2 text-white/90">${priceSigns}</span>` : ''}
+                    ${distanceText ? `<span class="ml-2 text-white/90">📍 ${distanceText}</span>` : ''}
                 </div>
                 <a href="https://www.google.com/maps/place/?q=place_id:${place.id}" target="_blank" rel="noopener noreferrer" class="mt-2 mb-1 inline-block bg-white/90 text-orange-600 px-3 py-1 rounded-lg text-xs font-semibold hover:bg-white transition-colors">
                     View Menu
