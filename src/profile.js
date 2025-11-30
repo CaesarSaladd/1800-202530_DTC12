@@ -1,5 +1,5 @@
 import { db, auth } from "./firebaseConfig.js";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc, writeBatch } from "firebase/firestore";
 
 
 async function populateCrave() {
@@ -114,6 +114,70 @@ document.addEventListener("click", (event) => {
     if (button) {
         const dropdown = button.nextElementSibling;
         dropdown.classList.toggle("hidden");
+    }
+});
+
+// Clear all craves function
+async function clearAllCraves() {
+    return new Promise((resolve) => {
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                console.log("No user logged in");
+                resolve();
+                return;
+            }
+
+            const userId = user.uid;
+            const craveCardContainer = document.getElementById("profCraves");
+
+            try {
+                // Get all crave documents
+                const cravesRef = collection(db, "users", userId, "craves");
+                const querySnapshot = await getDocs(cravesRef);
+
+                if (querySnapshot.empty) {
+                    console.log("No craves to clear");
+                    resolve();
+                    return;
+                }
+
+                // Use batch delete for better performance
+                const batch = writeBatch(db);
+                querySnapshot.forEach((docSnap) => {
+                    const docRef = doc(db, "users", userId, "craves", docSnap.id);
+                    batch.delete(docRef);
+                });
+
+                await batch.commit();
+
+                // Clear the UI
+                craveCardContainer.innerHTML = "";
+
+                console.log("All craves cleared successfully");
+                resolve();
+            } catch (error) {
+                console.error("Error clearing craves:", error);
+                resolve();
+            }
+        });
+    });
+}
+
+// Add event listener for clear craves button
+document.addEventListener("DOMContentLoaded", () => {
+    const clearCravesBtn = document.getElementById("clearCravesBtn");
+    if (clearCravesBtn) {
+        clearCravesBtn.addEventListener("click", async () => {
+            // Confirm before clearing
+            const confirmed = confirm("Are you sure you want to clear all your craves? This action cannot be undone.");
+            if (confirmed) {
+                clearCravesBtn.disabled = true;
+                clearCravesBtn.textContent = "Clearing...";
+                await clearAllCraves();
+                clearCravesBtn.disabled = false;
+                clearCravesBtn.textContent = "Clear Craves";
+            }
+        });
     }
 });
 

@@ -41,9 +41,13 @@
 
     <main class="flex flex-col justify-center items-center overflow-y-auto">
 
-        <div class="w-full">
-            <h1 class="flex justify-center my-5 ml-2 text-3xl font-bold tracking-tight drop-shadow-lg text-orange-600">
-                Craves </h1>
+        <div class="w-full flex items-center justify-between my-5 px-4">
+            <h1 class="text-3xl font-bold tracking-tight drop-shadow-lg text-orange-600">
+                Craves
+            </h1>
+            <button id="clearCravesBtn" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors">
+                Clear Craves
+            </button>
         </div>
         <section id="profCraves" class="flex gap-x-5 max-w-full overflow-x-auto mb-5">
             <template id="craves" class="flex space-x-8 flex-nowrap">
@@ -90,9 +94,10 @@
             </template>
         </section>
 
-        <div class="w-full">
-            <h1 class="flex justify-center my-5 ml-2 text-3xl font-bold tracking-tight text-orange-600 drop-shadow-lg">
-                Reviews </h1>
+        <div class="w-full flex items-center justify-between my-5 px-4">
+            <h1 class="text-3xl font-bold tracking-tight drop-shadow-lg text-orange-600">
+                Reviews
+            </h1>
         </div>
         <section id="profReviews" class="flex gap-x-5 max-w-full overflow-x-auto mb-28 drop-shadow-lg">
             <template id="reviews" class="flex space-x-8 flex-nowrap">
