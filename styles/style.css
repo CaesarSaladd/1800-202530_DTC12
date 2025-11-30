@@ -105,3 +105,6 @@
     pointer-events: none;
 }
 
+.article {
+    padding: 40px;
+}
