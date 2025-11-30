@@ -304,10 +304,23 @@ document.addEventListener("DOMContentLoaded", () => {
         dropdown.innerHTML = "";
 
         const cuisines = [
-            "Sushi",
-            "Steak",
-            "Burger",
-            "Italian"
+            "American",
+            "BBQ",
+            "Chinese",
+            "French",
+            "Greek",
+            "Indian",
+            "Italian",
+            "Japanese",
+            "Korean",
+            "Lebanese",
+            "Mediterranean",
+            "Mexican",
+            "Middle Eastern",
+            "Spanish",
+            "Thai",
+            "Turkish",
+            "Vietnamese"
         ];
 
         cuisines.forEach((cuisine) => {
@@ -335,7 +348,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("applyCuisine").addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
-            e.stopImmediatePropagation();
+            
             const selected = [...document.querySelectorAll(".checkbox-cuisine:checked")].map((cb) => cb.value);
 
             if (selected.length === 0) {
@@ -346,18 +359,8 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Selected cuisines:", selected);
 
             if (window.lastSearchResults.length > 0) {
-                const filtered = window.lastSearchResults.filter(place => {
-                    const name = place.name?.toLowerCase() || "";
-                    return selected.some(cuisine =>
-                        name.includes(cuisine.toLowerCase())
-                    );
-                });
-
-
-                // Show filtered list in UI
-                window.lastSearchResults = filtered;
+                // Just call the filter function directly
                 filterExistingResultsByCuisine(selected);
-
             } else {
                 // fallback: query Google if no prior search
                 const keyword = selected.join(", ");
@@ -491,7 +494,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const request = {
             query: "restaurant",
             location: latLng,
-            radius: 1500,
+            radius: 5000,
         };
 
         service.textSearch(request, (results, status) => {
@@ -861,69 +864,95 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Filter existing results by cusiine
+    // Filter existing results by cuisine
     function filterExistingResultsByCuisine(selectedCuisines) {
         const container = document.getElementById("resultsContainer");
-        container.innerHTML = "";
+        container.innerHTML = "<p class='text-gray-500 px-4'>Searching for restaurants...</p>";
         clearMarkers();
 
-        const filtered = window.lastSearchResults.filter(place => {
-            const name = place.name?.toLowerCase() || "";
-            return selectedCuisines.some(cuisine =>
-                name.includes(cuisine.toLowerCase())
+        // Use Google Places API to search for the cuisines
+        const keyword = selectedCuisines.join(", ");
+        
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                pos => searchByCuisine({ lat: pos.coords.latitude, lng: pos.coords.longitude }, selectedCuisines),
+                () => searchByCuisine({ lat: 49.282868, lng: -123.125032 }, selectedCuisines)
             );
-        });
-
-
-        if (filtered.length === 0) {
-            container.innerHTML = `<p class="text-gray-600 px-4">No restaurants match your selected cuisines.</p>`;
-            return;
+        } else {
+            searchByCuisine({ lat: 49.282868, lng: -123.125032 }, selectedCuisines);
         }
+    }
 
-        filtered.forEach((place) => {
-            if (place.geometry?.location) {
-                const marker = new google.maps.Marker({
-                    map,
-                    position: place.geometry.location,
-                    title: place.name,
-                });
-                markers.push(marker);
+    // New function to search by cuisine
+    function searchByCuisine(location, selectedCuisines) {
+        const latLng = new google.maps.LatLng(location.lat, location.lng);
+        const service = new google.maps.places.PlacesService(map);
+        
+        const keyword = selectedCuisines.join(" OR ");
+        
+        const request = {
+            query: `${keyword} restaurant`,
+            location: latLng,
+            radius: 5000,
+        };
+
+        service.textSearch(request, (results, status) => {
+            const container = document.getElementById("resultsContainer");
+            container.innerHTML = "";
+            clearMarkers();
+
+            if (status !== google.maps.places.PlacesServiceStatus.OK || !results?.length) {
+                container.innerHTML = `<p class="text-gray-600 px-4">No restaurants found for the selected cuisines.</p>`;
+                return;
             }
 
-            const priceSigns = place.price_level ? "$".repeat(place.price_level) : "N/A";
-            const card = document.createElement("div");
-            card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
-            card.innerHTML = `
-                <div class="flex justify-between items-start mb-2">
-                    <h3 class="font-bold">${place.name}</h3>
-                </div>
-                <p>${place.formatted_address || "No address available"}</p>
-                <p class="text-yellow-600">⭐ ${place.rating || "N/A"}</p>
-                <p class="text-gray-700"> ${priceSigns}</p>
-            `;
+            // Save results for further filtering
+            window.lastSearchResults = results;
+            window.originalSearchResults = [...results];
 
-            const addButton = document.createElement("button");
-            addButton.textContent = "+";
-            addButton.className = "ml-2 bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
-            addButton.addEventListener("click", async () => {
-                await addToCrave(addButton, {
-                    name: place.name,
-                    formattedAddress: place.formatted_address,
-                    rating: place.rating,
+            results.forEach((place) => {
+                if (place.geometry?.location) {
+                    const marker = new google.maps.Marker({
+                        map,
+                        position: place.geometry.location,
+                        title: place.name,
+                    });
+                    markers.push(marker);
+                }
+
+                const priceSigns = place.price_level ? "$".repeat(place.price_level) : "N/A";
+                const card = document.createElement("div");
+                card.className = "bg-white w-full px-3 py-2 rounded-2xl shadow";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold">${place.name}</h3>
+                    </div>
+                    <p>${place.formatted_address || "No address available"}</p>
+                    <p class="text-yellow-600">⭐ ${place.rating || "N/A"}</p>
+                    <p class="text-gray-700">${priceSigns}</p>
+                `;
+
+                const addButton = document.createElement("button");
+                addButton.textContent = "+";
+                addButton.className = "ml-2 bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-400 font-bold flex-shrink-0 self-start";
+                addButton.addEventListener("click", async () => {
+                    await addToCrave(addButton, {
+                        name: place.name,
+                        formattedAddress: place.formatted_address,
+                        rating: place.rating,
+                    });
+                    addButton.textContent = "✓ Added";
+                    addButton.disabled = true;
+                    addButton.classList.add("opacity-70");
                 });
-                addButton.textContent = "✓ Added";
-                addButton.disabled = true;
-                addButton.classList.add("opacity-70");
+
+                const headerDiv = card.querySelector("div");
+                headerDiv.appendChild(addButton);
+                container.appendChild(card);
             });
 
-            const headerDiv = card.querySelector("div");
-            headerDiv.appendChild(addButton);
-            container.appendChild(card);
+            showFilterSummary({ cuisines: selectedCuisines });
         });
-
-        // Update memory so you can sort by price next
-        window.lastSearchResults = filtered;
-        showFilterSummary({ cuisines: selectedCuisines });
-
     }
 
     // Filter summary
