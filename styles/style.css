@@ -94,6 +94,7 @@
     -ms-user-select: none;
     user-select: none;
     -webkit-user-drag: none;
+<<<<<<< HEAD
     touch-action: pan-y pan-x;
     -webkit-touch-callout: none;
 }
@@ -115,6 +116,8 @@ main {
 /* Ensure body allows touch events */
 body {
     touch-action: manipulation;
+=======
+>>>>>>> parent of 1ebfc7d (Fix mobile bug)
 }
 
 #card-container .card img {
