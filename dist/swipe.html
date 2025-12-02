@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+
+    <title>Swipe Page</title>
+  <script type="module" crossorigin src="/assets/swipe-xwt9lTz0.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/style-CbcU32hS.js">
+  <link rel="modulepreload" crossorigin href="/assets/footer-DqjFuR03.js">
+  <link rel="modulepreload" crossorigin href="/assets/firebaseConfig-cEQ9fNQE.js">
+  <link rel="stylesheet" crossorigin href="/assets/style-BYlDunGf.css">
+</head>
+
+<body class="mx-auto max-w-screen-lg my-2 bg-[#FFF6E9]">
+    <header>
+        <div class="menu flex flex-row justify-between items-center gap-4">
+            <img src="/assets/binge_invis-BFz0VspE.png" width="100" class="object-contain pl-3">
+            <button id="show-tutorial-btn" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
+                How to Swipe
+            </button>
+        </div>
+    </header>
+    <main class="flex flex-col items-center justify-center min-h-screen bg-orange-300 font-[Nunito_Sans] overflow-hidden relative">
+        <!-- Desktop Fixed Indicators (hidden on mobile) -->
+        <div class="hidden md:block fixed left-8 top-1/2 -translate-y-1/2 flex flex-col items-center z-20 pointer-events-none">
+            <div class="text-6xl mb-2 text-red-500 font-bold animate-pulse">←</div>
+            <div class="bg-red-500/90 text-white px-4 py-2 rounded-lg font-semibold text-base shadow-lg whitespace-nowrap">
+                Leftovers
+            </div>
+        </div>
+        
+        <div class="hidden md:block fixed right-8 top-1/2 -translate-y-1/2 flex flex-col items-center z-20 pointer-events-none">
+            <div class="text-6xl mb-2 text-green-500 font-bold animate-pulse">→</div>
+            <div class="bg-green-500/90 text-white px-4 py-2 rounded-lg font-semibold text-base shadow-lg whitespace-nowrap">
+                Craves
+            </div>
+        </div>
+        
+        <!-- Tutorial Popup -->
+        <div id="swipe-tutorial" class="fixed inset-0 bg-black/60 z-30 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl relative">
+                <button id="close-tutorial" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl font-bold">×</button>
+                <h3 class="text-xl font-bold mb-4 text-center">How to Swipe</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="text-4xl text-green-500 font-bold">→</div>
+                        <div class="flex-1">
+                            <div class="font-semibold text-green-600">Swipe Right</div>
+                            <div class="text-sm text-gray-600">Add to Craves</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="text-4xl text-red-500 font-bold">←</div>
+                        <div class="flex-1">
+                            <div class="font-semibold text-red-600">Swipe Left</div>
+                            <div class="text-sm text-gray-600">Add to Leftovers</div>
+                        </div>
+                    </div>
+                </div>
+                <button id="got-it-btn" class="mt-6 w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition">
+                    Got it!
+                </button>
+            </div>
+        </div>
+        
+        <div id="card-container" class="relative w-[400px] h-[600px] -translate-y-20 overflow-visible" style="z-index: 1;">
+        </div>
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center justify-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-4 border-orange-500 border-t-transparent mb-4"></div>
+            <p class="text-xl text-gray-800 font-semibold">Loading more restaurants...</p>
+        </div>
+        <p id="status" class="mt-8 ml-6 text-xl text-gray-800 font-semibold -translate-y-20 text-center" style="z-index: 1;">
+        </p>
+    </main>
+
+    <site-footer></site-footer>
+
+    <script async
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKJe5Ga1Zc1anQ8ivg617LvGaChAy8aE4&libraries=places"></script>
+
+
+</body>
+
+</html>

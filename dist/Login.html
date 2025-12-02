@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binge Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module" crossorigin src="/assets/login-Dn0OoGb5.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/style-CbcU32hS.js">
+  <link rel="modulepreload" crossorigin href="/assets/firebaseConfig-cEQ9fNQE.js">
+  <link rel="modulepreload" crossorigin href="/assets/bootstrap.esm-Cguh7NES.js">
+  <link rel="modulepreload" crossorigin href="/assets/app-DAZ9vNtY.js">
+  <link rel="stylesheet" crossorigin href="/assets/style-BYlDunGf.css">
+  <link rel="stylesheet" crossorigin href="/assets/bootstrap-C11chwFa.css">
+</head>
+
+<body class="binge-font bg-[#FFF6E9]">
+
+    <div id="loginView" class="loginBox">
+        <div class="loginlogo">
+            <img src="/assets/binge_invis-BFz0VspE.png" alt="Binge Logo">
+        </div>
+        <p class="text-4xl binge-font " style="margin-bottom: 10px;">LOGIN:</p>
+        <div id="authAlert" class="alert alert-danger d-none" role="alert"></div>
+
+        <form id="loginForm">
+            <label for="loginEmail">Email:</label>
+            </br>
+            <input type="email" class="loginput" name="email" id="loginEmail" required>
+            </br>
+            </br>
+
+            <label for="loginPassword">Password:</label>
+            </br>
+            <input type="password" class="loginput" name="password" id="loginPassword" required>
+            </br>
+            </br>
+
+            <button type="submit"
+                class="loginButton bg-orange-600 rounded-xl py-2 px-4 gap-3 text-white binge-font">Login</button>
+        </form>
+
+        <small class="d-block mt-3 text-center">
+            Don't have an account?
+            <a href="#" id="toSignup" class="no-underline text-orange-600">Sign up</a>
+        </small>
+    </div>
+
+    <div id="signupView" class="loginBox d-none">
+        <p class="text-4xl" style="margin-bottom: 10px;">SIGN-UP:</p>
+
+        <div id="authAlert" class="alert alert-danger d-none"></div>
+
+        <form id="signupForm">
+            <label for="signupName">Create Username:</label>
+            <br>
+            <input type="text" id="signupName" class="loginput" name="username" required>
+            <br><br>
+
+            <label for="signupEmail">Email:</label>
+            <br>
+            <input type="email" id="signupEmail" class="loginput" name="email" required>
+            <br><br>
+
+            <label for="signupPassword">Create Password:</label>
+            <br>
+            <input type="password" id="signupPassword" class="loginput" name="password" required>
+            <br><br>
+
+            <label for="signupConfirmPassword">Confirm Password:</label>
+            <br>
+            <input type="password" id="signupConfirmPassword" class="loginput" name="confirmPassword" required>
+            <br><br>
+
+            <button type="submit"
+                class="loginButton bg-orange-600 rounded-xl py-2 px-4 gap-3 text-white binge-font">Sign Up!</button>
+        </form>
+
+        <small class="d-block mt-3 text-center">
+            Already have an account?
+            <a href="#" id="toLogin" class="no-underline text-orange-600">Login</a>
+        </small>
+    </div>
+
+</body>
+
+</html>

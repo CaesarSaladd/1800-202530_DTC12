@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <title>Document</title>
+  <script type="module" crossorigin src="/assets/leftovers-Cqo586Nm.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/style-CbcU32hS.js">
+  <link rel="modulepreload" crossorigin href="/assets/footer-DqjFuR03.js">
+  <link rel="modulepreload" crossorigin href="/assets/firebaseConfig-cEQ9fNQE.js">
+  <link rel="stylesheet" crossorigin href="/assets/style-BYlDunGf.css">
+</head>
+
+<body class="mx-auto max-w-screen-lg my-2 bg-[#FFF6E9]">
+    <div class="px-4 py-2">
+        <a href="settings.html" 
+        class="flex items-center text-orange-600 font-semibold text-lg hover:text-orange-700 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" 
+                class="h-6 w-6 mr-1" 
+                fill="none" viewBox="0 0 24 24" 
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" 
+                    d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+        </a>
+    </div>
+    <main class="flex flex-col justify-center items-center overflow-y-auto">
+        
+        <div class="w-full">
+            <h1 class="flex justify-center my-5 ml-2 text-3xl font-bold tracking-tight drop-shadow-lg text-orange-600">
+                Your Leftovers:
+            </h1>
+        </div>
+        <div>
+            <button id="clearAllButton"
+                class="px-4 py-2 mb-4 rounded bg-orange-500 text-white font-bold hover:bg-orange-600">
+                Clear All Leftovers
+            </button>
+        </div>
+
+        <!-- Container for dynamically inserted cards -->
+        <section id="LeftoversContainer"
+            class="flex gap-x-5 max-w-full overflow-x-auto mb-5 px-2 py-3">
+
+            <!-- Template for each leftover card -->
+            <template id="Leftovers">
+                <div
+                    class="LeftoverCard w-80 flex-shrink-0 p-6 border-2 border-[#1F1F1F] rounded-lg relative drop-shadow-2xl bg-orange-100">
+
+                    <div class="flex justify-between gap-x-4">
+                        <h5 class="LeftoverName mb-2 mr-2 text-2xl font-semibold tracking-tight text-gray-900"></h5>
+
+                        <div class="relative inline-block text-left">
+                            <button type="button"
+                                class="dropdownBtn inline-flex justify-center w-full rounded-md font-extrabold text-3xl text-orange-500 hover:bg-orange-300"
+                                id="menu-button">
+                                x
+                            </button>
+                            <!-- Dropdown menu -->
+                            <div
+                                class="dropdownMenu hidden origin-top-right absolute right-0 mt-2 w-40 rounded-md bg-white shadow-md">
+                                <div class="py-1">
+                                    <button
+                                        class="delButton w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-orange-100">
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="LeftoverReview tracking-wider mt-auto font-bold text-gray-700"></p>
+                    <p class="LeftoverAddress text-gray-700"></p>
+
+                </div>
+            </template>
+        </section>
+    </main>
+
+    <site-footer></site-footer>
+
+</body>
+
+</html>
