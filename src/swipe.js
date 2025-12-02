@@ -745,6 +745,8 @@ function addCardsToUI(restaurants, stack) {
         card.style.zIndex = "10"; // Ensure cards are above container but below footer
         card.style.userSelect = "none"; // Prevent text selection during swipe
         card.style.webkitUserSelect = "none"; // Prevent text selection in WebKit browsers
+        card.style.touchAction = "none"; // Allow swipe library to handle all touch events
+        card.style.webkitTouchCallout = "none"; // Prevent iOS callout menu
         
         // Prevent default drag behavior on card
         card.addEventListener("dragstart", (e) => {
