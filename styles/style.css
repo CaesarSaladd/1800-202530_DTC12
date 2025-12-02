@@ -94,12 +94,12 @@
     -ms-user-select: none;
     user-select: none;
     -webkit-user-drag: none;
-    touch-action: none;
+    touch-action: pan-y pan-x;
     -webkit-touch-callout: none;
 }
 
 #card-container .card {
-    touch-action: none;
+    touch-action: pan-y pan-x;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -moz-user-select: none;

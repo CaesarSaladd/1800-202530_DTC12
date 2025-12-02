@@ -323,30 +323,46 @@ async function initMap() {
 document.addEventListener("DOMContentLoaded", () => {
     const burgerButton = document.getElementById("burger-menu");
     const dropdown = document.getElementById("myDropdown");
+    // Get the button wrapper that contains the burger icon
+    const buttonWrapper = burgerButton ? burgerButton.closest("button") : null;
 
     let isDropdownOpen = false;
 
-    // Toggle dropdown
+    // Toggle dropdown - listen on both the image and button wrapper
     if (burgerButton && dropdown) {
-        burgerButton.addEventListener("click", (event) => {
+        const toggleDropdown = (event) => {
             event.stopPropagation();
+            event.preventDefault();
 
             // Toggle visiblity of dropdown
-            const willOpen = dropdown.classList.contains("hidden");
-            dropdown.classList.toggle("hidden");
-            isDropdownOpen = willOpen;
+            const isCurrentlyHidden = dropdown.classList.contains("hidden");
+            isDropdownOpen = isCurrentlyHidden;
 
-            // Reset transition when opened
-            if (willOpen) {
+            if (isCurrentlyHidden) {
+                // Show dropdown - remove hidden and set display
+                dropdown.classList.remove("hidden");
+                dropdown.style.display = "block";
+                // Force reflow
+                void dropdown.offsetHeight;
+                // Remove initial opacity/scale, then add visible classes
                 dropdown.classList.remove("opacity-0", "scale-95");
-                setTimeout(() => {
-                    dropdown.classList.add("opacity-100", "scale-100");
-                }, 10);
+                dropdown.classList.add("opacity-100", "scale-100");
             } else {
+                // Hide dropdown
                 dropdown.classList.remove("opacity-100", "scale-100");
                 dropdown.classList.add("opacity-0", "scale-95");
+                setTimeout(() => {
+                    dropdown.classList.add("hidden");
+                    dropdown.style.display = "";
+                }, 200); // Wait for transition to complete
             }
-        });
+        };
+
+        // Add event listener to both the image and button wrapper
+        burgerButton.addEventListener("click", toggleDropdown);
+        if (buttonWrapper) {
+            buttonWrapper.addEventListener("click", toggleDropdown);
+        }
 
         // Prevent clicks inside dropdown from closing it
         dropdown.addEventListener("click", (event) => {
@@ -358,7 +374,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (
                 isDropdownOpen &&
                 !dropdown.contains(event.target) &&
-                !burgerButton.contains(event.target)
+                !burgerButton.contains(event.target) &&
+                !(buttonWrapper && buttonWrapper.contains(event.target))
             ) {
                 closeDropdown();
             }
@@ -366,10 +383,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function closeDropdown() {
-        dropdown.classList.add("hidden");
-        dropdown.classList.remove("opacity-100", "scale-100");
-        dropdown.classList.add("opacity-0", "scale-95");
-        isDropdownOpen = false;
+        if (!dropdown.classList.contains("hidden")) {
+            dropdown.classList.remove("opacity-100", "scale-100");
+            dropdown.classList.add("opacity-0", "scale-95");
+            setTimeout(() => {
+                dropdown.classList.add("hidden");
+                dropdown.style.display = "";
+            }, 200); // Wait for transition to complete
+            isDropdownOpen = false;
+        }
     }
 
     // Load filters from Firestore database
