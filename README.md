@@ -33,10 +33,11 @@ Example:
 
 ## Usage
 
-1. Open your browser and visit `http://localhost:3000`.
-2. Browse the list of hiking trails displayed on the main page.
-3. Click the heart icon (or similar) to mark a trail as a favorite.
-4. View your favorite hikes in the favorites section.
+1. Open your CLI and type 'run npm dev'.
+2. Login or Sign Up and see displayed restaurants on search page or swipe.
+3. Swipe right to like restaurants and swipe left to dislike restaurants.
+4. Add liked restaurants to your profile page and click on the pencil to write reivews.
+5. View your reviews on the bottom section of profile page.
 
 ---
 
@@ -44,20 +45,38 @@ Example:
 ## Project Structure
 
 ```
-elmo-hikes/
+1800-202530_DTC12/
 ├── src/
-│   ├── main.js
+│   ├── app.js
+│   ├── authetication.js
+│   ├── firebaseConfig.js
+│   ├── firebaseUserRef.js
+│   ├── leftovers.js
+│   ├── login.js
+│   ├── profile.js
+│   ├── profileEdit.js
+│   ├── review.js
+│   ├── search.js
+│   ├── swipe.js
 ├── styles/
 │   └── style.css
 ├── public/
 ├── images/
+│   ├──binge_invis.png
+│   ├── binge.jpg
+│   ├── settings.png
 ├── index.html
-├── package.json
+├── profile.html
+├── review.html
+├── settings.html
+├── search.html
+├── swipe.json
+├── login.json
+├── leftovers.json
 ├── README.md
 ```
 
 ---
-
 
 ## Contributors
 - **Julio** - BCIT CST Student who loves to play FPS games and go on hikes. Has lived in 4 different countries.
@@ -68,14 +87,13 @@ elmo-hikes/
 
 ## Acknowledgments
 
-- Trail data and images are for demonstration purposes only.
-- Code snippets were adapted from resources such as [Stack Overflow](https://stackoverflow.com/) and [MDN Web Docs](https://developer.mozilla.org/).
-- Icons sourced from [FontAwesome](https://fontawesome.com/) and images from [Unsplash](https://unsplash.com/).
-
+- Code snippets were adapted from resources such as [Stack Overflow](https://stackoverflow.com/) and [Chat-GPT](https://chatgpt.com/) and COMP-1800 Course Demos.
+- 
 ---
 
 
 ## Limitations and Future Work
+
 ### Limitations
 
 - Limited trail details (e.g., no live trail conditions).
