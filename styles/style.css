@@ -94,30 +94,6 @@
     -ms-user-select: none;
     user-select: none;
     -webkit-user-drag: none;
-<<<<<<< HEAD
-    touch-action: pan-y pan-x;
-    -webkit-touch-callout: none;
-}
-
-#card-container .card {
-    touch-action: pan-y pan-x;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-/* Ensure main element allows touch events for swiping */
-main {
-    touch-action: pan-y pan-x;
-}
-
-/* Ensure body allows touch events */
-body {
-    touch-action: manipulation;
-=======
->>>>>>> parent of 1ebfc7d (Fix mobile bug)
 }
 
 #card-container .card img {
