@@ -17,6 +17,7 @@
 - View your personalized Craves and Leftovers lists
 - Secure authentication using Firebase
 - Fully responsive design for desktop and mobile devices
+- Create reviews for restaurants in your Craves list
 
 ---
 
@@ -42,6 +43,7 @@ Example:
 5. Swipe right to add a restaurant to Craves.
 6. Swipe left to remove it from your recommendations.
 7. View all saved restaurants in your Craves list.
+8. Write reviews for your craves in your profile
 
 ---
 
