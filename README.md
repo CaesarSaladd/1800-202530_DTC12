@@ -116,8 +116,8 @@ Example:
 ## Acknowledgments
 
 - Restaurant data for demonstration purposes only.
-- Code snippets were adapted from resources such as [Stack Overflow](https://stackoverflow.com/) and [MDN Web Docs](https://developer.mozilla.org/).
-- Icons sourced from [FontAwesome](https://fontawesome.com/) and images from [Unsplash](https://unsplash.com/).
+- Code snippets were adapted from resources such as [Stack Overflow](https://stackoverflow.com/) and [Chat-GPT](https://chatgpt.com/) and COMP-1800 Course Demos.
+- Icons sourced from [TablerIcons]((https://tablericons.com/))
 
 ---
 
