@@ -1,21 +1,22 @@
 # Binge - Your next favorite food app!
-## Dating is overated. Eat good food instead!
+## Use Binge to discover new restaurants around you!
 
 ## Overview
-- Elmo Hikes is a client-side JavaScript web application that helps users discover and explore hiking trails. The app displays a curated list of hike trails, each with details such as name, location, difficulty, and an image. Users can browse the list and mark their favorite trails for easy access later.
-- Developed for the COMP 1800 course, this project applies User-Centred Design practices and agile project management, and demonstrates integration with Firebase backend services for storing user favorites.
-Elmo Hikes is a client-side JavaScript web application that helps users discover and explore hiking trails. The app displays a curated list of hike trails, each with details such as name, location, difficulty, and an image. Users can browse the list and mark their favorite trails for easy access later.
-- Developed for the COMP 1800 course, this project applies User-Centred Design practices and agile project management, and demonstrates integration with Firebase backend services for storing user favorites.
+- Binge is a client-side JavaScript web application designed to help users discover new restaurants through location based searching and interactive swiping. Users can explore nearby restaurants using a live map and filters, or swipe through personalized restaurant recommendations.
+- Originally developed for the COMP 1800 course at BCIT, this project applies User-Centred Design principles, agile project management, and integrates Firebase backend services to store user preferences such as saved restaurants (“Craves”) and rejected options (“Leftovers”).
 
 ---
 
 
 ## Features
 
-- Browse a list of curated hiking trails with images and details
-- Mark and unmark trails as favorites
-- View a personalized list of favorite hikes
-- Responsive design for desktop and mobile
+- Search nearby restaurants using a live interactive map
+- Filter results by cuisine, price, and reviews
+- Swipe right to save restaurants to Craves
+- Swipe left to remove restaurants from your recommendations
+- View your personalized Craves and Leftovers lists
+- Secure authentication using Firebase
+- Fully responsive design for desktop and mobile devices
 
 ---
 
@@ -23,20 +24,24 @@ Elmo Hikes is a client-side JavaScript web application that helps users discover
 ## Technologies Used
 
 Example:
-- **Frontend**: HTML, CSS, JavaScript
+- **Frontend**: HTML, Tailwind CSS, JavaScript
 - **Build Tool**: [Vite](https://vitejs.dev/)
-- **Backend**: Firebase for hosting
+- **Backend**: Firebase for hosting and authentication
 - **Database**: Firestore
+- **API**: Google Maps and Places API
 
 ---
 
 
 ## Usage
 
-1. Open your browser and visit `http://localhost:3000`.
-2. Browse the list of hiking trails displayed on the main page.
-3. Click the heart icon (or similar) to mark a trail as a favorite.
-4. View your favorite hikes in the favorites section.
+1. Open your browser and visit `https://binge-94730.web.app/`.
+2. Log in or create an account.
+3. Browse nearby restaurants on the Search page using the live map and filters.
+4. Use the Swipe page to discover restaurants interactively.
+5. Swipe right to add a restaurant to Craves.
+6. Swipe left to remove it from your recommendations.
+7. View all saved restaurants in your Craves list.
 
 ---
 
@@ -44,31 +49,72 @@ Example:
 ## Project Structure
 
 ```
-elmo-hikes/
+
+1800-202530_DTC12/
+├── .firebase/
+│   └── hosting.*.cache
+├── dist/
+│   └── assets/
+├── images/
+│   ├── binge_invis.png
+│   ├── binge.jpg
+│   ├── logo.jpg
+│   ├── settings.svg
+│   └── vertical_dots.svg
+├── node_modules/
 ├── src/
+│   ├── components/
+│   ├── app.js
+│   ├── authentication.js
+│   ├── firebaseConfig.js
+│   ├── firebaseUserRef.js
+│   ├── leftovers.js
+│   ├── login.js
 │   ├── main.js
+│   ├── profile.js
+│   ├── ProfileEdit.js
+│   ├── review.js
+│   ├── search.js
+│   └── swipe.js
 ├── styles/
 │   └── style.css
-├── public/
-├── images/
+├── .env
+├── .firebaserc
+├── .gitignore
+├── burger.svg
+├── faq.html
+├── firebase.json
+├── firestore.indexes.json
+├── firestore.rules
 ├── index.html
+├── leftovers.html
+├── Login.html
+├── package-lock.json
 ├── package.json
+├── profile.html
+├── profileEdit.html
 ├── README.md
-```
+├── review.html
+├── search.html
+├── settings.html
+├── swipe.html
+├── tailwind.config.js
+└── vite.config.js
 
+```
 ---
 
 
 ## Contributors
 - **Julio** - BCIT CST Student who loves to play FPS games and go on hikes. Has lived in 4 different countries.
-- Jameel - BCIT CST Student, aspiring full-stack developer who enjoys playing video games in his spare time.
+- **Jameel** - BCIT CST Student, aspiring full-stack developer who enjoys playing video games in his spare time.
 - **Declan Shorman** - BCIT CST Student, specializes in backend programming. Fun fact: Loves solving Rubik's Cubes in under a minute.
 ---
 
 
 ## Acknowledgments
 
-- Trail data and images are for demonstration purposes only.
+- Restaurant data for demonstration purposes only.
 - Code snippets were adapted from resources such as [Stack Overflow](https://stackoverflow.com/) and [MDN Web Docs](https://developer.mozilla.org/).
 - Icons sourced from [FontAwesome](https://fontawesome.com/) and images from [Unsplash](https://unsplash.com/).
 
@@ -78,18 +124,16 @@ elmo-hikes/
 ## Limitations and Future Work
 ### Limitations
 
-- Limited trail details (e.g., no live trail conditions).
-- Accessibility features can be further improved.
+- No real-time restaurant availability or wait times
+- Limited accessibility features
+- Recommendation logic is basic
 
 ### Future Work
-
-- Implement map view and trailhead directions.
-- Add filtering and sorting options (e.g., by difficulty, distance).
-- Create a dark mode for better usability in low-light conditions.
+- Advanced recommendation algorithm using user behavior
+- Live restaurant availability and wait times
+- In-app navigation to restaurants
+- Dark mode support
+- Enhanced accessibility and screen-reader support
+- Group swiping and social features
 
 ---
-
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
