@@ -2,21 +2,20 @@
 ## Dating is overated. Eat good food instead!
 
 ## Overview
-- Elmo Hikes is a client-side JavaScript web application that helps users discover and explore hiking trails. The app displays a curated list of hike trails, each with details such as name, location, difficulty, and an image. Users can browse the list and mark their favorite trails for easy access later.
-- Developed for the COMP 1800 course, this project applies User-Centred Design practices and agile project management, and demonstrates integration with Firebase backend services for storing user favorites.
-Elmo Hikes is a client-side JavaScript web application that helps users discover and explore hiking trails. The app displays a curated list of hike trails, each with details such as name, location, difficulty, and an image. Users can browse the list and mark their favorite trails for easy access later.
-- Developed for the COMP 1800 course, this project applies User-Centred Design practices and agile project management, and demonstrates integration with Firebase backend services for storing user favorites.
-
+- Binge is a client-side JavaScript web application that helps users discover and explore restaurants. The app allows users to search for restaurants using filters such as cuisine, price, distance, and ratings, or swipe through a deck of restaurant cards to quickly browse options. Each restaurant card includes key details such as name, location, cuisine type, price range, and an image. Users can browse freely and save their favorite restaurants for easy access later.
+- Developed for the COMP 1800 course, this project applies User-Centred Design principles and agile project management, and demonstrates integration with Firebase backend services for storing user favorites and supporting real-time updates. Binge is designed to make choosing where to eat fast, intuitive, and fun.
 ---
 
 
 ## Features
 
-- Browse a list of curated hiking trails with images and details
-- Mark and unmark trails as favorites
-- View a personalized list of favorite hikes
+- Browse a list of curated restaurants with images and details
+- Swipe through a deck of restaurant cards to discover new options
+- Filter restaurants by cuisine, price, distance, and rating
+- Mark and unmark restaurants as favorites
+- Write, edit, and read reviews for restaurants
 - Responsive design for desktop and mobile
-
+  
 ---
 
 
@@ -88,7 +87,6 @@ Example:
 ## Acknowledgments
 
 - Code snippets were adapted from resources such as [Stack Overflow](https://stackoverflow.com/) and [Chat-GPT](https://chatgpt.com/) and COMP-1800 Course Demos.
-- 
 ---
 
 
