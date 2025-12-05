@@ -117,7 +117,7 @@ Example:
 
 - Restaurant data for demonstration purposes only.
 - Code snippets were adapted from resources such as [Stack Overflow](https://stackoverflow.com/) and [Chat-GPT](https://chatgpt.com/) and COMP-1800 Course Demos.
-- Icons sourced from [TablerIcons]((https://tablericons.com/))
+- Icons sourced from [TablerIcons](https://tablericons.com/)
 
 ---
 
