@@ -104,7 +104,6 @@ Example:
 ```
 ---
 
-
 ## Contributors
 - **Julio** - BCIT CST Student who loves to play FPS games and go on hikes. Has lived in 4 different countries.
 - **Jameel** - BCIT CST Student, aspiring full-stack developer who enjoys playing video games in his spare time.
@@ -122,6 +121,7 @@ Example:
 
 
 ## Limitations and Future Work
+
 ### Limitations
 
 - No real-time restaurant availability or wait times
